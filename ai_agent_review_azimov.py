@@ -6,8 +6,9 @@ from pathlib import Path
 from langchain.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
-from openai_client import ApiKeyLoader, ChatModelFactory
 from pydantic import BaseModel, Field
+
+from openai_client import ApiKeyLoader, ChatModelFactory
 
 
 # === MODELO DE SAÍDA PADRÃO (Pydantic) ===

@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv  # type: ignore
-from openai import OpenAI  # type: ignore
 from langchain_openai import ChatOpenAI  # type: ignore
+from openai import OpenAI  # type: ignore
 
 
 #* Exceção customizada para ausência da chave da API
@@ -198,10 +198,9 @@ class ChatModelFactory:
             ChatOpenAI: Instância configurada para análises
         """
         return ChatOpenAI(
-            openai_api_key=self.api_key,
-            model_name=model_name,
+            api_key=self.api_key,  # type: ignore
+            model=model_name,      # fixed
             temperature=temperature,
-            }
         )
     
     def create_creative_model(
@@ -224,8 +223,8 @@ class ChatModelFactory:
             ChatOpenAI: Instância configurada para criatividade
         """
         return ChatOpenAI(
-            openai_api_key=self.api_key,
-            model_name=model_name,
+            api_key=self.api_key,  # type: ignore
+            model=model_name,      # fixed
             temperature=temperature,
         
         )
@@ -250,8 +249,8 @@ class ChatModelFactory:
             ChatOpenAI: Instância configurada para conversas
         """
         return ChatOpenAI(
-            openai_api_key=self.api_key,
-            model_name=model_name,
+            api_key=self.api_key,  # type: ignore
+            model=model_name,      # fixed
             temperature=temperature,
         )
     
@@ -260,7 +259,7 @@ class ChatModelFactory:
         model_name: str,
         temperature: float,
         max_tokens: int = 2048,
-        **kwargs
+        **kwargs: object
     ) -> ChatOpenAI:
         """
         Cria um modelo com configurações personalizadas.
@@ -275,8 +274,8 @@ class ChatModelFactory:
             ChatOpenAI: Instância com configurações personalizadas
         """
         return ChatOpenAI(
-            openai_api_key=self.api_key,
-            model_name=model_name,
+            api_key=self.api_key,  # type: ignore
+            model=model_name,      # fixed
             temperature=temperature,
         )
 
