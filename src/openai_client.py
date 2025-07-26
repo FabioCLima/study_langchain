@@ -19,60 +19,36 @@ class ApiKeyNotFoundError(Exception):
     pass
 
 class ApiKeyLoader:
-    #* Loads the OpenAI API key from a .env file
-    #* SRP: Esta classe tem uma única responsabilidade: carregar a chave da API
-    #* do arquivo .env
     """
-    A utility class to load the OpenAI API key from a specified .env file.
-
-    Args:
-        env_path (Path): Path to the .env file containing the OPENAI_API_KEY
-        variable.
-
-    Example:
-        >>> loader = ApiKeyLoader(Path(".env"))
-        >>> try:
-        ...     api_key = loader.get_openai_key()
-        ... except ValueError as e:
-        ...     print(f"Failed to load API key: {e}")
+    Utility to load the OpenAI API key from a .env file.
+    If no path is provided, it searches for .env in the current and parent directories.
     """
 
-    def __init__(self, env_path: Path) -> None:
-        """
-        Initializes the ApiKeyLoader with the path to the .env file.
+    def __init__(self, env_path: Path | None = None) -> None:
+        if env_path is not None:
+            if not env_path.exists() or not env_path.is_file():
+                raise ValueError(f"Invalid .env path: {env_path}")
+            self.env_path = env_path
+        else:
+            found_env = self._find_env_path()
+            if found_env is None:
+                raise ValueError("Could not find a .env file in current or parent directories.")
+            self.env_path = found_env
 
-        Args:
-            env_path (Path): Path to the .env file.
-
-        Raises:
-            ValueError: If the provided path does not exist or is not a file.
-        """
-        if not env_path.exists():
-            msg = f"Invalid path: '{env_path}' does not exist."
-            raise ValueError(msg)
-        if not env_path.is_file():
-            msg = f"'{env_path}' is not a valid file."
-            raise ValueError(msg)
-
-        self.env_path: Path = env_path
+    def _find_env_path(self) -> Path | None:
+        """Searches for a .env file in current and parent directories."""
+        current = Path(__file__).resolve().parent
+        for parent in [current, *current.parents]:
+            candidate = parent / ".env"
+            if candidate.exists() and candidate.is_file():
+                return candidate
+        return None
 
     def get_openai_key(self) -> str:
-        """
-        Loads and returns the OpenAI API key from the .env file.
-        # Tipagem explícita e tratamento de erro didático
-        Returns:
-            str: The OpenAI API key.
-        Raises:
-            ValueError: If OPENAI_API_KEY is missing or empty in the .env file.
-        """
         load_dotenv(self.env_path)
-        api_key: str | None = os.getenv("OPENAI_API_KEY")
-
+        api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
-            msg = ("The OPENAI_API_KEY environment variable is not set in the "
-                   ".env file.")
-            #* Herança simples: ApiKeyNotFoundError herda de exception
-            raise ApiKeyNotFoundError(msg)
+            raise ApiKeyNotFoundError("OPENAI_API_KEY not found in .env file.")
         return api_key
 
 

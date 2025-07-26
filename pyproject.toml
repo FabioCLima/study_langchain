@@ -7,12 +7,13 @@ authors = [{ name = "Fabio Lima", email = "lima.fisico@gmail.com" }]
 requires-python = ">=3.13"
 dependencies = [
     "ipykernel>=6.29.5",
-    "langchain>=0.3.26",
+    "langchain[openai]>=0.3.26",
     "langchain-community>=0.3.27",
     "langchain-core>=0.3.68",
     "langchain-openai>=0.3.27",
     "langchain-postgres>=0.0.15",
     "langchain-text-splitters>=0.3.8",
+    "langgraph>=0.5.4",
     "openai>=1.93.0",
     "python-dotenv>=1.1.1",
     "requests>=2.32.4",
