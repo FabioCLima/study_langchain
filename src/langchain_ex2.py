@@ -1,14 +1,16 @@
 # study_langchain/langchain_ex1.py
-'''Exemplo de script com o modelo de chat da OpenAI, e o prompt template para gerar o 
-prompt para ser usado com o modelo de chat'''
+"""Exemplo de script com o modelo de chat da OpenAI, e o prompt template para gerar o
+prompt para ser usado com o modelo de chat"""
 
 from contextlib import redirect_stdout
 from io import StringIO
 
 from langchain.prompts import PromptTemplate  # type: ignore
-from langchain_core.messages import (AIMessage, BaseMessage,  # type: ignore
-                                     HumanMessage, SystemMessage)
-from langchain_openai import ChatOpenAI  # type: ignore
+from langchain_core.messages import (  # type: ignore
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+)
 
 from openai_client import create_analytical_model
 
@@ -23,9 +25,7 @@ system_msg = SystemMessage(
 )
 
 # 2. HumanMessage: Mensagem do usuário (pergunta)
-human_msg = HumanMessage(
-    content="O que é uma lista em Python e como eu crio uma?"
-)
+human_msg = HumanMessage(content="O que é uma lista em Python e como eu crio uma?")
 
 # 3. AIMessage: (Simulação de resposta do modelo)
 ai_msg = AIMessage(
@@ -44,7 +44,7 @@ messages = [system_msg, human_msg, ai_msg]
 for msg in messages:
     print(f"[{msg.__class__.__name__}] {msg.content}\n")
 
-#* Sem logs de debug ou prints
+# * Sem logs de debug ou prints
 with redirect_stdout(StringIO()):
     model = create_analytical_model()
 

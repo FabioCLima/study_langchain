@@ -1,27 +1,27 @@
-'''
+"""
 Exercício1: O Crítico culinário
     Objetivo é praticar a conexão de duas chain que não tem formato de entrada e saída,
     compatíveis, exigindo um "adaptador" - "RunnableLambda"
-    
+
     crie uma `chain_pratos` que recebe um `País` e lista 3 práticos típicos do país.
-    input = {"país": 'Itália'   
-    output_expected = []  
-'''
+    input = {"país": 'Itália'
+    output_expected = []
+"""
 
 from contextlib import redirect_stdout
 from io import StringIO
 
-from openai_client import create_analytical_model
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
 from langchain_openai import ChatOpenAI
 
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnableLambda
+from openai_client import create_analytical_model
 
-#* Sem logs de debug ou print
+# * Sem logs de debug ou print
 with redirect_stdout(StringIO()):
     model: ChatOpenAI | None = create_analytical_model()
-    
+
 
 if model is None:
     print("❌ Erro: Não foi possível criar o modelo OpenAI.")
@@ -32,8 +32,8 @@ if model is None:
     exit(1)
 
 parser = StrOutputParser()
-    
-#* 1.Chains individuais:
+
+# * 1.Chains individuais:
 prompt_pratos = ChatPromptTemplate.from_template(
     "Liste 3 pratos típicos do seguinte país: {pais}"
 )
@@ -41,24 +41,27 @@ chain_pratos = prompt_pratos | model | parser  # type: ignore
 
 
 prompt_descricao = ChatPromptTemplate.from_template(
-    """Descreve o prato '{nome_do_prato}' de forma curta e apetitosa.""")
+    """Descreve o prato '{nome_do_prato}' de forma curta e apetitosa."""
+)
 chain_descricao = prompt_descricao | model | parser  # type: ignore
 
-#* 2.Função para extrair o primeiro prato
+
+# * 2.Função para extrair o primeiro prato
 def extrair_primeiro_prato(texto_lista: str) -> str:
     """Extrai o nome do primeiro prato da lista retornada pelo modelo."""
     linhas = texto_lista.strip().split("\n")
     if not linhas:
         return "Prato não encontrado"
-    
+
     primeira_linha = linhas[0]
     # Remove "1. ", "1- ", "1) " etc
-    for separador in ['. ', '- ', ') ']:
+    for separador in [". ", "- ", ") "]:
         if separador in primeira_linha:
             return primeira_linha.split(separador, 1)[1]
-    
+
     # Se não encontrar separador, retorna a linha completa
     return primeira_linha
+
 
 # 3. Chain combinada
 chain_final = (  # type: ignore

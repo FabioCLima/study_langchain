@@ -21,12 +21,13 @@ dependencies = [
     "langchain-chroma>=0.2.0",
     "beautifulsoup4>=4.12.2",
     "pypdf>=5.1.0",
-    "psycopg[binary]>=3.2.4",  # Updated to include [binary] extra
+    "psycopg[binary]>=3.2.4", # Updated to include [binary] extra
     "setuptools>=75.8.0",
     "langsmith>=0.3.2",
     "langgraph-checkpoint-sqlite>=2.0.3",
     "duckduckgo-search>=7.3.0",
-    "langgraph-cli>=0.1.73"
+    "langgraph-cli>=0.1.73",
+    "grandalf>=0.8",
 ]
 [project.optional-dependencies]
 dev = ["ruff", "pyright", "pytest", "pytest-xdist"]

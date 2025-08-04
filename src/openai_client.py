@@ -1,22 +1,23 @@
-#langchain-udacity/llm_client/openai_client.py
+# langchain-udacity/llm_client/openai_client.py
 
 import os
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv  # type: ignore
 from langchain_openai import ChatOpenAI  # type: ignore
 from openai import OpenAI  # type: ignore
 
 
-#* Exceção customizada para ausência da chave da API
+# * Exceção customizada para ausência da chave da API
 class ApiKeyNotFoundError(Exception):
     """
     Exceção lançada quando a chave OPENAI_API_KEY não é encontrada no arquivo .env.
     Herda de Exception (herança simples em Python).
     Boas práticas: crie exceções específicas para facilitar o tratamento de erros.
     """
+
     pass
+
 
 class ApiKeyLoader:
     """
@@ -32,7 +33,9 @@ class ApiKeyLoader:
         else:
             found_env = self._find_env_path()
             if found_env is None:
-                raise ValueError("Could not find a .env file in current or parent directories.")
+                raise ValueError(
+                    "Could not find a .env file in current or parent directories."
+                )
             self.env_path = found_env
 
     def _find_env_path(self) -> Path | None:
@@ -53,8 +56,8 @@ class ApiKeyLoader:
 
 
 class OpenAIClient:
-    #* A high-level abstraction for the OpenAI API client
-    #* SRP: Esta classe encapsula a configuração e acesso ao cliente OpenAI
+    # * A high-level abstraction for the OpenAI API client
+    # * SRP: Esta classe encapsula a configuração e acesso ao cliente OpenAI
     """
     A high-level abstraction layer for interacting with the OpenAI API.
     This class:
@@ -142,10 +145,10 @@ class ChatModelFactory:
     def __init__(self, api_key: str) -> None:
         """
         Inicializa a factory com a chave da API.
-        
+
         Args:
             api_key (str): Chave válida da API da OpenAI
-            
+
         Raises:
             ValueError: Se a api_key estiver vazia ou None
         """
@@ -155,9 +158,7 @@ class ChatModelFactory:
         self.api_key: str = api_key
 
     def create_analytical_model(
-        self, 
-        model_name: str = "gpt-4", 
-        temperature: float = 0.1
+        self, model_name: str = "gpt-4", temperature: float = 0.1
     ) -> ChatOpenAI:
         """
         Cria um modelo otimizado para análises e tarefas que requerem precisão.
@@ -175,105 +176,100 @@ class ChatModelFactory:
         """
         return ChatOpenAI(
             api_key=self.api_key,  # type: ignore
-            model=model_name,      # fixed
+            model=model_name,  # fixed
             temperature=temperature,
         )
-    
+
     def create_creative_model(
-        self, 
-        model_name: str = "gpt-3.5-turbo", 
-        temperature: float = 0.8
+        self, model_name: str = "gpt-3.5-turbo", temperature: float = 0.8
     ) -> ChatOpenAI:
         """
         Cria um modelo otimizado para tarefas criativas.
-        
+
         Configuração:
         - Temperatura alta (0.8) para respostas mais criativas
         - GPT-3.5-turbo por padrão (mais rápido e econômico)
-        
+
         Args:
             model_name (str): Nome do modelo OpenAI (padrão: "gpt-3.5-turbo")
             temperature (float): Controla a criatividade (padrão: 0.8)
-            
+
         Returns:
             ChatOpenAI: Instância configurada para criatividade
         """
         return ChatOpenAI(
             api_key=self.api_key,  # type: ignore
-            model=model_name,      # fixed
+            model=model_name,  # fixed
             temperature=temperature,
-        
         )
-    
+
     def create_conversational_model(
-        self, 
-        model_name: str = "gpt-3.5-turbo", 
-        temperature: float = 0.7
+        self, model_name: str = "gpt-3.5-turbo", temperature: float = 0.7
     ) -> ChatOpenAI:
         """
         Cria um modelo balanceado para conversas naturais.
-        
+
         Configuração:
         - Temperatura moderada (0.7) para equilíbrio entre precisão e naturalidade
         - GPT-3.5-turbo por padrão para boa performance
-        
+
         Args:
             model_name (str): Nome do modelo OpenAI (padrão: "gpt-3.5-turbo")
             temperature (float): Controla a naturalidade (padrão: 0.7)
-            
+
         Returns:
             ChatOpenAI: Instância configurada para conversas
         """
         return ChatOpenAI(
             api_key=self.api_key,  # type: ignore
-            model=model_name,      # fixed
+            model=model_name,  # fixed
             temperature=temperature,
         )
-    
+
     def create_custom_model(
         self,
         model_name: str,
         temperature: float,
         max_tokens: int = 2048,
-        **kwargs: object
+        **kwargs: object,
     ) -> ChatOpenAI:
         """
         Cria um modelo com configurações personalizadas.
-        
+
         Args:
             model_name (str): Nome do modelo OpenAI
             temperature (float): Controla a aleatoriedade (0.0 a 2.0)
             max_tokens (int): Número máximo de tokens na resposta
             **kwargs: Argumentos adicionais para o modelo
-            
+
         Returns:
             ChatOpenAI: Instância com configurações personalizadas
         """
         return ChatOpenAI(
             api_key=self.api_key,  # type: ignore
-            model=model_name,      # fixed
+            model=model_name,  # fixed
             temperature=temperature,
         )
 
 
 #! Facilita importação em outros módulos
-__all__ = ["ApiKeyLoader", "OpenAIClient", "ChatModelFactory"] 
+__all__ = ["ApiKeyLoader", "ChatModelFactory", "OpenAIClient"]
 
 
 # === FUNÇÃO UTILITÁRIA PARA CRIAR MODELO ANALÍTICO ===
-def create_analytical_model() -> Optional[ChatOpenAI]:
+def create_analytical_model() -> ChatOpenAI | None:
     """
     Função utilitária que demonstra o uso completo do módulo para criar
     um modelo analítico.
-    
+
     Esta função:
     1. Carrega a chave da API do arquivo .env
     2. Cria uma instância da ChatModelFactory
     3. Retorna um modelo configurado para análises
-    
+
     Returns:
         Optional[ChatOpenAI]: Modelo analítico ou None em caso de erro
-        
+
     Example:
         >>> model = create_analytical_model()
         >>> if model:
@@ -284,12 +280,12 @@ def create_analytical_model() -> Optional[ChatOpenAI]:
         loader: ApiKeyLoader = ApiKeyLoader(Path(env_file_path))
         openai_api_key = loader.get_openai_key()
         print(f"Chave da API OpenAI carregada com sucesso: ***{openai_api_key[-4:]}")
-        
+
         chat_factory = ChatModelFactory(openai_api_key)
         analytical_llm = chat_factory.create_analytical_model()
         print("Modelo de chat OpenAI criado com sucesso!")
         return analytical_llm
-        
+
     except (ValueError, ApiKeyNotFoundError) as e:
         print(f"Erro ao carregar a chave da API: {e}")
         return None
@@ -304,25 +300,31 @@ def example_usage() -> None:
         loader: ApiKeyLoader = ApiKeyLoader(Path(env_file_path))
         openai_api_key = loader.get_openai_key()
         print(f"Loaded OpenAI API key: ***{openai_api_key[-4:]}")
-        
+
         # Exemplo com OpenAI client original
         client = OpenAIClient(openai_api_key)
         openai_client = client.client
         print(f"OpenAI client created: {openai_client}")
-        
+
         # Exemplo com ChatModelFactory
         chat_factory = ChatModelFactory(openai_api_key)
-        
+
         # Diferentes tipos de modelos
         analytical_model = chat_factory.create_analytical_model()
         creative_model = chat_factory.create_creative_model()
         conversational_model = chat_factory.create_conversational_model()
-        
+
         print("✅ Todos os modelos de chat foram criados com sucesso!")
-        print(f"📊 Modelo analítico: {analytical_model.model_name} (temp: {analytical_model.temperature})")
-        print(f"🎨 Modelo criativo: {creative_model.model_name} (temp: {creative_model.temperature})")
-        print(f"💬 Modelo conversacional: {conversational_model.model_name} (temp: {conversational_model.temperature})")
-        
+        print(
+            f"📊 Modelo analítico: {analytical_model.model_name} (temp: {analytical_model.temperature})"
+        )
+        print(
+            f"🎨 Modelo criativo: {creative_model.model_name} (temp: {creative_model.temperature})"
+        )
+        print(
+            f"💬 Modelo conversacional: {conversational_model.model_name} (temp: {conversational_model.temperature})"
+        )
+
     except (ValueError, ApiKeyNotFoundError) as e:
         print(f"Error: {e}")
 
@@ -330,8 +332,8 @@ def example_usage() -> None:
 if __name__ == "__main__":
     # Exemplo de uso com a nova funcionalidade
     example_usage()
-    
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("Testando a função create_analytical_model():")
     model = create_analytical_model()
     if model:
@@ -339,10 +341,10 @@ if __name__ == "__main__":
 
 # Sugestão didática: Exemplos de importação
 # from openai_client import ApiKeyLoader, OpenAIClient, ChatModelFactory, create_analytical_model
-# 
+#
 # # Uso básico
 # model = create_analytical_model()
-# 
+#
 # # Uso avançado
 # loader = ApiKeyLoader(Path(".env"))
 # api_key = loader.get_openai_key()

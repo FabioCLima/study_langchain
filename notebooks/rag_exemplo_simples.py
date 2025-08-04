@@ -3,21 +3,22 @@ RAG + Zero Prompting + Tools + Chain of Thought
 Exemplo prático combinando todas as técnicas
 """
 
+import math
 import os
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+
+from langchain.agents import AgentType, initialize_agent
+from langchain.chains import RetrievalQA
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
-from langchain.chains import RetrievalQA
-from langchain.tools import Tool
-from langchain.agents import initialize_agent, AgentType
 from langchain.schema import Document
-import math
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.tools import Tool
+from langchain.vectorstores import FAISS
 
-#* Carrega as variáveis de ambiente
+# * Carrega as variáveis de ambiente
 _ = load_dotenv(find_dotenv())
 
-#* Verifica se a API key está configurada
+# * Verifica se a API key está configurada
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("OPENAI_API_KEY não encontrada no arquivo .env")
 
@@ -32,7 +33,7 @@ documentos = [
     "A lei de Ohm estabelece que V = I * R, onde V é tensão, I é corrente e R é resistência.",
     "O teorema de Pitágoras diz que em um triângulo retângulo, a² + b² = c², onde c é a hipotenusa.",
     "A área de um círculo é π * r², onde r é o raio do círculo.",
-    "A força gravitacional entre dois objetos é F = G * (m1 * m2) / r², onde G é a constante gravitacional."
+    "A força gravitacional entre dois objetos é F = G * (m1 * m2) / r², onde G é a constante gravitacional.",
 ]
 
 # Converter em Documents
@@ -56,35 +57,39 @@ except Exception as e:
 # 2. CRIANDO TOOLS (FERRAMENTAS)
 print("\n2. Criando ferramentas de cálculo...")
 
+
 def calcular_energia_cinetica(massa: float, velocidade: float) -> float:
     """Calcula energia cinética usando E = (1/2) * m * v²"""
-    return 0.5 * massa * (velocidade ** 2)
+    return 0.5 * massa * (velocidade**2)
+
 
 def calcular_area_circulo(raio: float) -> float:
     """Calcula área de um círculo usando π * r²"""
-    return math.pi * (raio ** 2)
+    return math.pi * (raio**2)
+
 
 def teorema_pitagoras(a: float, b: float) -> float:
     """Calcula hipotenusa usando a² + b² = c²"""
     return math.sqrt(a**2 + b**2)
 
+
 # Criar tools do LangChain
 tool_energia = Tool(
     name="Calculadora_Energia_Cinetica",
     description="Calcula energia cinética. Use: 'massa,velocidade' (ex: '10,5' para 10kg e 5m/s)",
-    func=lambda x: calcular_energia_cinetica(*[float(i) for i in x.split(',')])
+    func=lambda x: calcular_energia_cinetica(*[float(i) for i in x.split(",")]),
 )
 
 tool_area = Tool(
     name="Calculadora_Area_Circulo",
     description="Calcula área de círculo. Use apenas o raio (ex: '5' para raio=5)",
-    func=lambda x: calcular_area_circulo(float(x))
+    func=lambda x: calcular_area_circulo(float(x)),
 )
 
 tool_pitagoras = Tool(
     name="Teorema_Pitagoras",
     description="Calcula hipotenusa. Use: 'cateto1,cateto2' (ex: '3,4')",
-    func=lambda x: teorema_pitagoras(*[float(i) for i in x.split(',')])
+    func=lambda x: teorema_pitagoras(*[float(i) for i in x.split(",")]),
 )
 
 tools = [tool_energia, tool_area, tool_pitagoras]
@@ -98,17 +103,14 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
 # Criar RAG chain
 rag_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True
+    llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True
 )
 
 # Tool para RAG
 rag_tool = Tool(
     name="Consulta_Base_Conhecimento",
     description="Busca informações na base de conhecimento sobre física e matemática",
-    func=lambda x: rag_chain.run(x)
+    func=lambda x: rag_chain.run(x),
 )
 
 all_tools = tools + [rag_tool]
@@ -138,15 +140,15 @@ agent = initialize_agent(
     llm=llm,
     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
     verbose=True,
-    handle_parsing_errors=True
+    handle_parsing_errors=True,
 )
 
 print("✓ Agent configurado com sucesso!")
 
 # 5. EXEMPLOS PRÁTICOS
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("EXEMPLOS PRÁTICOS")
-print("="*60)
+print("=" * 60)
 
 # Exemplo 1: RAG + CoT + Tool
 print("\n🔬 EXEMPLO 1: Energia Cinética")
@@ -193,9 +195,9 @@ try:
 except Exception as e:
     print(f"❌ Erro: {e}")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("ANÁLISE DOS COMPONENTES")
-print("="*60)
+print("=" * 60)
 
 print("""
 🔍 RAG (Retrieval-Augmented Generation):

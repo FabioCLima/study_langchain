@@ -4,8 +4,11 @@ Protótipo: Estruturação de mensagens no LangChain com SystemMessage, HumanMes
 O assistente tem papel e comportamento bem definidos para responder sobre Python básico.
 """
 
-from langchain_core.messages import (AIMessage, HumanMessage,  # type: ignore
-                                     SystemMessage)
+from langchain_core.messages import (  # type: ignore
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+)
 
 # 1. Definição do papel e comportamento do assistente
 system_msg = SystemMessage(
@@ -16,9 +19,7 @@ system_msg = SystemMessage(
 )
 
 # 2. Mensagem do usuário
-human_msg = HumanMessage(
-    content="Como faço um loop for em Python?"
-)
+human_msg = HumanMessage(content="Como faço um loop for em Python?")
 
 # 3. Simulação de resposta da IA (em protótipos, útil para testar fluxos)
 ai_msg = AIMessage(
@@ -35,4 +36,3 @@ messages = [system_msg, human_msg, ai_msg]
 # 5. Exemplo de uso: imprime as mensagens do histórico
 for msg in messages:
     print(f"[{msg.__class__.__name__}] {msg.content}\n")
- 
