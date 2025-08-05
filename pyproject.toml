@@ -28,6 +28,8 @@ dependencies = [
     "duckduckgo-search>=7.3.0",
     "langgraph-cli>=0.1.73",
     "grandalf>=0.8",
+    "ruff>=0.12.4",
+    "mypy>=1.17.1",
 ]
 [project.optional-dependencies]
 dev = ["ruff", "pyright", "pytest", "pytest-xdist"]
