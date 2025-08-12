@@ -2,48 +2,47 @@
 Chain - Restaurantes
 A partir da cidade recomendada, a chain retorna uma lista de restaurantes.
 """
-from typing import Any, Dict
-from langchain_openai import ChatOpenAI
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
-from langchain_core.runnables import Runnable
+from langchain_openai import ChatOpenAI
 from models.pydantic_models import ListaRestaurantes
+from utils.logger_setup import project_logger  # Loguru
+
+if TYPE_CHECKING:
+    from langchain_core.runnables import Runnable
 
 
-def create_chain_restaurantes(model: ChatOpenAI) -> Runnable[Dict[str, Any], ListaRestaurantes]:
+def create_chain_restaurantes(model: ChatOpenAI) -> Callable[[dict[str, Any]], ListaRestaurantes]:
     """
-    Cria e retorna uma chain que, dada uma cidade, sugere uma lista de restaurantes
+    Cria uma chain que, dada uma cidade, sugere uma lista de restaurantes
     formatada de acordo com o modelo Pydantic ListaRestaurantes.
     """
-    
-    # 1. Criar o Parser:
-    # Apenas um parser é necessário. Ele "sabe" como analisar a saída do LLM
-    # e como gerar as instruções de formato para o nosso modelo Pydantic.
     parser = PydanticOutputParser(pydantic_object=ListaRestaurantes)
 
-    # 2. Definir o Template do Prompt:
-    # Esta é a instrução que damos ao LLM. Note as duas variáveis:
-    # {cidade} -> Será preenchida quando executarmos a chain.
-    # {format_instructions} -> Será pré-preenchida com as instruções do parser.
-    prompt_template = """Você é um assistente especialista em gastronomia e trabalha para a agência de viagens.
-    
-Para a cidade {cidade}, sugira uma lista contendo:
-- 3 restaurantes de comida caseira de boa qualidade
-- 3 restaurantes mais sofisticados
+    prompt_template = """
+    Você é um assistente especialista em gastronomia e trabalha para uma agência de viagens.
 
-{format_instructions}"""
+    Para a cidade {cidade}, sugira uma lista contendo:
+    - 3 restaurantes de comida caseira de boa qualidade
+    - 3 restaurantes mais sofisticados
 
-    # 3. Criar o Objeto de Prompt:
-    # Usamos o template e já injetamos as instruções de formato.
-    # Isso deixa a chain esperando apenas a variável {cidade} no momento da execução.
+    {format_instructions}
+    """
+
     prompt = ChatPromptTemplate.from_template(
         template=prompt_template,
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
 
-    # 4. Montar a Chain com o operador pipe (|):
-    # Este é o fluxo de dados da LangChain Expression Language (LCEL).
-    # O input (dicionário com a "cidade") passa pelo prompt, depois pelo modelo, e finalmente é formatado pelo parser.
-    chain = prompt | model | parser
-    
-    return chain
+    chain: Runnable[dict[str, Any], ListaRestaurantes] = prompt | model | parser
+
+    def run_with_logging(inputs: dict[str, Any]) -> ListaRestaurantes:
+        project_logger.debug(f"[Chain Restaurantes] Entrada recebida: {inputs}")
+        output = chain.invoke(inputs)
+        project_logger.debug(f"[Chain Restaurantes] Saída gerada: {output}")
+        return output
+
+    return run_with_logging

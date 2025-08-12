@@ -30,6 +30,8 @@ dependencies = [
     "grandalf>=0.8",
     "ruff>=0.12.4",
     "mypy>=1.17.1",
+    "pydantic-settings>=2.10.1",
+    "loguru>=0.7.3",
 ]
 [project.optional-dependencies]
 dev = ["ruff", "pyright", "pytest", "pytest-xdist"]
