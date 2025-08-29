@@ -1,9 +1,20 @@
 # Jupyter Notebook: Estudo de Workflow Multi-Etapas com LangChain (LCEL)
 
 # ## 1. Configuração do ambiente e modelo
-
 import os
+import time
+from operator import itemgetter
+from typing import Any, Dict
+
 from dotenv import load_dotenv, find_dotenv
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import (
+    RunnableLambda,
+    RunnableParallel,
+    RunnablePassthrough,
+    RunnableSerializable,
+)
 from langchain_openai import ChatOpenAI
 
 _ = load_dotenv(find_dotenv())
@@ -14,12 +25,6 @@ if not os.getenv("OPENAI_API_KEY"):
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.0)
 
 # ## 2. Ferramentas auxiliares: Parser, Logging e Utilitários
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnableParallel, RunnableLambda, RunnablePassthrough
-from operator import itemgetter
-import time
-
 # Parser padrão para extrair texto puro
 txt_parser = StrOutputParser()
 
@@ -32,9 +37,6 @@ def log_with_timestamp(data):
 log_chain = RunnableLambda(log_with_timestamp) | RunnablePassthrough()
 
 # ## 3. Definição dos Prompts e Cadeias Modulares
-
-from langchain_core.prompts import PromptTemplate
-
 # Prompt para gerar ideia de negócio
 idea_prompt = PromptTemplate.from_template(
     """
@@ -74,7 +76,7 @@ report_chain = report_prompt | llm.with_structured_output(schema=AnalysisReport)
 
 # ## 5. Cadeia de ponta a ponta (multi-etapas)
 
-e2e_chain = (
+e2e_chain: RunnableSerializable[Dict[str, str], AnalysisReport] = (
     idea_chain
     | RunnableParallel(idea=itemgetter("output"))
     | analysis_chain

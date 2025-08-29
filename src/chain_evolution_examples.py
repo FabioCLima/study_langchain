@@ -12,7 +12,7 @@ Cada exemplo mostra uma evolução específica:
 """
 
 import os
-from typing import Any
+from typing import Any, Dict
 
 from dotenv import find_dotenv, load_dotenv
 from langchain_core.memory import ConversationBufferMemory  # type: ignore
@@ -21,7 +21,10 @@ from langchain_core.output_parsers import (  # type: ignore
     StrOutputParser,
 )
 from langchain_core.prompts import ChatPromptTemplate  # type: ignore
-from langchain_core.runnables import RunnablePassthrough  # type: ignore
+from langchain_core.runnables import (  # type: ignore
+    RunnablePassthrough,
+    RunnableSerializable,
+)
 from langchain_openai import ChatOpenAI  # type: ignore
 from pydantic import BaseModel, Field
 
@@ -52,7 +55,9 @@ def example_1_basic_chain():
     output_parser = StrOutputParser()
 
     # Chain
-    chain = prompt | model | output_parser
+    chain: RunnableSerializable[
+        Dict[str, str], str
+    ] = prompt | model | output_parser
 
     # Execução
     response = chain.invoke({"question": "O que é inteligência artificial?"})
@@ -101,7 +106,9 @@ def example_2_structured_chain():
     output_parser = JsonOutputParser(pydantic_object=AIResponse)
 
     # Chain
-    chain = prompt | model | output_parser
+    chain: RunnableSerializable[
+        Dict[str, str], AIResponse
+    ] = prompt | model | output_parser
 
     # Execução
     response = chain.invoke({"concept": "Machine Learning"})
@@ -167,7 +174,7 @@ def example_3_multi_step_chain():
     )
 
     # Chain multi-step
-    chain = (
+    chain: RunnableSerializable[str, str] = (
         {"concept": RunnablePassthrough()}
         | analysis_prompt
         | model
@@ -241,7 +248,9 @@ def example_4_robust_chain():
     output_parser = StrOutputParser()
 
     # Chain
-    chain = prompt | model | output_parser
+    chain: RunnableSerializable[
+        Dict[str, str], str
+    ] = prompt | model | output_parser
 
     # Testes com diferentes inputs
     test_concepts = [
@@ -298,7 +307,9 @@ def example_5_memory_chain():
     output_parser = StrOutputParser()
 
     # Chain com memória
-    chain = prompt | model | output_parser
+    chain: RunnableSerializable[
+        Dict[str, Any], str
+    ] = prompt | model | output_parser
 
     # Simulação de conversa
     conversation_steps = [

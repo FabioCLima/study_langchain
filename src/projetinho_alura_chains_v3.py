@@ -229,4 +229,3 @@ def main() -> None:
 # o script for rodado diretamente.
 if __name__ == "__main__":
     main()
-    main()

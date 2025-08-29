@@ -1,15 +1,18 @@
 """
 This script is an example of how to use OpenAI's LLM model to create a chatbot.
 """
-
 from collections.abc import Sequence
+from typing import Any, Dict
 
 from langchain_core.messages import (
     AIMessage,
     BaseMessage,
     HumanMessage,
-    SystemMessage,  # type: ignore
+    SystemMessage,
 )
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableSerializable
 from langchain_openai import ChatOpenAI  # type: ignore
 
 from openai_client import ApiKeyLoader, ChatModelFactory
@@ -62,56 +65,57 @@ class MemoryManager:
         return self._memory[-limit:]
 
 
-class PromptFactory:
-    """Creates and formats prompts with personality and examples."""
-
-    def __init__(
-        self,
-        system_prompt: str,
-        few_shot_examples: Sequence[BaseMessage],
-    ):
-        self.system_prompt = SystemMessage(content=system_prompt)
-        self.few_shot_examples = list(few_shot_examples)
-
-    def build_full_prompt(
-        self, current_memory: list[BaseMessage], user_message: str
-    ) -> list[BaseMessage]:
-        """Builds the list of messages to send to the LLM."""
-        return [
-            self.system_prompt,
-            *self.few_shot_examples,
-            *current_memory,
-            HumanMessage(content=user_message),
+def create_prompt_template(
+    system_prompt: str, few_shot_examples: Sequence[BaseMessage]
+) -> ChatPromptTemplate:
+    """
+    Creates a ChatPromptTemplate using the modern list-of-tuples syntax.
+    This is more readable and flexible, especially with placeholders for history.
+    """
+    return ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt),
+            *few_shot_examples,
+            ("placeholder", "{conversation_history}"),
+            ("human", "{user_message}"),
         ]
+    )
 
 
 class Chatbot:
-    """Orchestrates the interaction between the user, memory, prompt factory, and LLM."""
+    """Orchestrates the interaction between the user, memory, and the LLM chain."""
 
     def __init__(
         self,
         llm: ChatOpenAI,
         memory: MemoryManager,
-        prompt_factory: PromptFactory,
+        prompt_template: ChatPromptTemplate,
     ):
         self.llm = llm
         self.memory = memory
-        self.prompt_factory = prompt_factory
+        self.prompt_template = prompt_template
+        # It's a good practice to define the full chain once.
+        self.chain: RunnableSerializable[
+            Dict[str, Any], str
+        ] = self.prompt_template | self.llm | StrOutputParser()
 
     def chat(self, user_message: str) -> str:
         """Processes the user's message and returns the AI's response."""
         current_history = self.memory.get_history()
-        full_prompt = self.prompt_factory.build_full_prompt(
-            current_history, user_message
+
+        # The chain now handles prompt creation and parsing internally.
+        ai_response_content = self.chain.invoke(
+            {
+                "conversation_history": current_history,
+                "user_message": user_message,
+            }
         )
 
-        ai_response = self.llm.invoke(full_prompt)
-
         self.memory.add_message(HumanMessage(content=user_message))
-        self.memory.add_message(ai_response)
+        # Since we use StrOutputParser, we wrap the response in an AIMessage for memory.
+        self.memory.add_message(AIMessage(content=ai_response_content))
 
-        # Garantir que sempre retorna str
-        return str(getattr(ai_response, "content", ai_response))
+        return ai_response_content
 
 
 def main():
@@ -139,13 +143,13 @@ def main():
         ),
     ]
 
-    memory = MemoryManager()
-    prompt_factory = PromptFactory(
+    prompt_template = create_prompt_template(
         system_prompt=pirate_personality, few_shot_examples=pirate_examples
     )
+    memory = MemoryManager()
 
     # 3. Assemble the ChatBot by injecting dependencies
-    chatbot = Chatbot(llm=llm, memory=memory, prompt_factory=prompt_factory)
+    chatbot = Chatbot(llm=llm, memory=memory, prompt_template=prompt_template)
 
     print("\n--- Chat with Captain Byte started! Type 'sair' to end. ---")
     while True:

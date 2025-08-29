@@ -84,7 +84,7 @@ report_chain = report_prompt | llm.with_structured_output(schema=AnalysisReport)
 # --- 4. A CHAIN DE PONTA A PONTA (VERSÃO MELHORADA E ROBUSTA) ---
 # Esta é a principal melhoria, corrigindo o "vício" do código original.
 # O fluxo de dados entre as etapas é explícito e garantido.
-e2e_chain = (
+e2e_chain: RunnableSerializable[Dict[str, str], AnalysisReport] = (
     # A entrada inicial para a cadeia é {"industry": "..."}
     idea_chain
     # A saída da 'idea_chain' é {'output': str, 'log': AIMessage}.

@@ -1,0 +1,83 @@
+🎥 Visão Geral
+🎥 Agente Avaliador de Correção Gramatical e Coesão Textual
+🎥 Classificador de Texto, Extrator de Entidades e Sumarizador
+🎥 Agente de Suporte ao Cliente com LangGraph
+🎥 NL2SQL
+🎥 Agente de IA com DuckDB e LangGraph
+❓ Quiz: Agente de IA com DuckDB e LangGraph
+🎥 Agente Duck com Croq e sem LangGraph
+❓ Quiz: Agente Duck com Croq e sem LangGraph
+🎥 Sistema de Triagem e Classificação de Currículos
+❓ Quiz: Sistema de Triagem e Classificação de Currículos
+🎥 AgentOps com LangGraph
+❓ Quiz: AgentOps com LangGraph
+🎥 MongoDB AI Agent – Parte 1
+🎥 MongoDB AI Agent – Parte 2
+❓ Quiz: MongoDB AI Agent
+🎥 Assistente de Gerenciamento de Inventário
+❓ Quiz: Assistente de Gerenciamento de Inventário
+🎥 RAG Agêntico com LangGraph
+❓ Quiz: RAG Agêntico com LangGraph
+🎥 Parte 1: Ferramenta de Geração Automática de Relatórios em PDF
+🎥 Parte 2: Ferramenta de Geração Automática de Relatórios em PDF
+❓ Quiz: Ferramenta de Geração Automática de Relatórios
+🎥 PydanticAI RAG com ChromaDB e Groq
+❓ Quiz: PydanticAI RAG com ChromaDB e Groq
+🎥 RAG Busca Hibrida com BM25 e PydanticAI
+❓ Quiz: RAG Busca Hibrida com BM25 e PydanticAI
+🎥 Parte 1: MCP na pratica (Agregador de noticias)
+🎥 Parte 2: MCP na pratica (Agregador de noticias)
+❓ Quiz: MCP na pratica (Agregador de noticias)
+
+Curso Introdutório de LangGraph
+🎥 Visão Geral
+🎥 Setup LangGraph
+🎥 Grafo
+🎥 Falando de Cadeias
+🎥 Roteadores
+🎥 Agente Simples Com Roteamento
+🎥 Agente com Memória
+❓ Quiz: Conceitos e Fundamentos do LangGraph
+🎥 Schema de Estado
+🎥 Reducers de Estado
+🎥 Schemas Múltiplos
+🎥 Filtrando e cortando/ reduzindo mensagens
+❓ Quiz: Gerenciamento de Mensagens e Estados
+🎥 Streaming, Interrupção e Human-In-Loop No LangGraph
+❓ Quiz: Streaming, Interrupção e Human-In-Loop No LangGraph
+🎥 Pontos de Interrupção (Breakpoints)
+❓ Quiz: Pontos de Interrupção (Breakpoints)
+🎥 Editando o Estado do Grafo com FeedBack Humano
+🎥 Pontos de Interrupção Dinâmicos
+🎥 Viagem no Tempo
+🎥 Paralelização
+🎥 Sub-Grafos
+🎥 Verificando os Sub-Grafos no Langsmith
+❓ Quiz sobre Sub-grafos no LangGraph
+🎥 MapReduce
+❓ Quiz: Conceitual sobre Map-Reduce
+🎥 Parte 1: Assistente de Pesquisa Final
+🎥 Parte 2: Assistente de Pesquisa Final
+❓ Quiz: Assistente de Pesquisa Final
+
+Curso Introdutório de PydanticAI
+🎥 Introdução
+🎥 Introdução, Arquitetura Interna do PydanticAI e Fluxo de Execução
+🎥 Estrutura, Criação de Agentes e Conceitos Básicos
+🎥 Injeção de Dependências e Ferramentas (Tools)
+❓ Quiz: Injeção de Dependências e Ferramentas (Tools)
+🎥 Execução e Iteração sobre o Grafo de Execução no PydanticAI
+❓ Quiz: Execução e Iteração sobre o Grafo de Execução no PydanticAI
+🎥 Configurações Avançadas de Model Settings e Tratamento de Erros
+❓ Quiz: Configurações Avançadas e Tratamento de Erros no PydanticAI
+🎥 Estratégias de Retry, Autocorreção e Feedback Iterativo
+❓ Quiz: Estratégias de Retry, Autocorreção e Feedback Iterativo
+🎥 Integração com RAG e Casos de Uso Avançados
+❓ Quiz: Integração com RAG e Casos de Uso Avançados
+🎥 Boas Práticas de Produção, Testes e Monitoramento
+❓ Quiz: Boas Práticas de Produção, Testes e Monitoramento
+🎥 Exemplos Práticos e Casos de Uso Reais
+❓ Quiz: Exemplos Práticos e Casos de Uso Reais do PydanticAI
+🎥 Perspectivas Futuras
+🎥 Conclusão PydanticAI
+❓ Quiz de Conclusão do Curso Introdutório de PydanticAI
