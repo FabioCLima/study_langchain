@@ -1,66 +1,50 @@
-'''
-Entre point do projeto. Utiliza uma estrutura de dados Pydantic para validar
-o nome de um animal e retorna uma descrição básica sobre ele
-1- chain recebe o nome do animal, a chain intermediária extrai o nome do animal e
-aciona o modelo LLM para gerar a descrição do animal.
+# main.py
+"""
+Ponto de entrada principal para a aplicação de descrição de animais.
 
-'''
-import os
-from utils import llm, AnimalDescricao # Importamos apenas o que vamos usar
-from langchain_core.runnables import RunnableLambda
-from langchain_core.prompts import ChatPromptTemplate
+Este script utiliza 'argparse' para criar uma interface de linha de comando (CLI)
+amigável, permitindo que o usuário peça a descrição de um animal específico.
 
-#* Desabilita o tracing para manter o output limpo nos exercícios
-os.environ["LANGCHAIN_TRACING_V2"] = "false"
+Como usar:
+$ python main.py --animal "Leão"
+"""
 
-#* --- 1. A Chain Principal: Gera a descrição de um animal ---
-#* Esta é a nossa "unidade de trabalho". Ela sabe como pegar o nome de um animal
-#* e transformá-lo em um objeto de descrição.
-prompt_gerador_descricao = ChatPromptTemplate.from_template(
-    """Você é um biólogo especialista. Forneça uma descrição curta e interessante sobre 
-    o animal: {nome_animal}."""
-)
+import argparse
+from chains.chain_animal_description import pipeline_completa
 
-chain_geradora_descricao = (
-    prompt_gerador_descricao
-    # CORREÇÃO: A saída deve ser AnimalDescricao, pois o prompt pede uma descrição.
-    | llm.with_structured_output(AnimalDescricao)
-)
-
-
-#* --- 2. O Formatador de Saída: Deixa o resultado bonito ---
-#* Uma função simples que recebe o objeto Pydantic e retorna uma string amigável.
-def formatar_saida_amigavel(animal_obj: AnimalDescricao) -> str:
-    """Recebe um objeto AnimalDescricao e retorna uma string formatada."""
-    return (
-        f"--- 🐾 Informações sobre: {animal_obj.nome} ---\n"
-        f"Descrição: {animal_obj.descricao}\n"
-        f"-----------------------------------"
+def main():
+    """
+    Função principal que configura o CLI, executa a pipeline e imprime o resultado.
+    """
+    # 1. Configuração do Parser de Argumentos
+    # Isso cria a ajuda e os argumentos que seu script aceita no terminal.
+    parser = argparse.ArgumentParser(
+        description="Gera uma descrição detalhada sobre um animal usando LangChain."
     )
+    parser.add_argument(
+        "--animal",
+        type=str,
+        required=True,
+        help="O nome do animal para o qual a descrição será gerada."
+    )
+    args = parser.parse_args()
 
+    # 2. Execução da Pipeline
+    # Tenta executar a pipeline importada e trata possíveis erros.
+    try:
+        print(f"🐾 Gerando descrição para: {args.animal}...")
+        
+        # O dicionário {"animal": args.animal} corresponde à entrada que a pipeline espera.
+        resultado_final = pipeline_completa.invoke({"animal": args.animal})
+        
+        print("\n✅ Descrição gerada com sucesso!")
+        print(resultado_final)
 
-#* --- 3. A Pipeline Completa: Conecta todos os passos ---
-#* Esta é a nossa esteira de produção. Ela define o fluxo do início ao fim.
-pipeline_completa = (
-    #* Passo 1: Adaptar a entrada do usuário.
-    #* CORREÇÃO: A lambda deve receber o dict de entrada {"animal": "..."}
-    #* e transformá-lo no dict que a chain_geradora_descricao espera: {"nome_animal": "..."}
-    RunnableLambda(lambda entrada: {"nome_animal": entrada["animal"]})
+    except Exception as e:
+        print(f"\n❌ Ocorreu um erro ao executar a pipeline: {e}")
 
-    #* Passo 2: Executar a chain principal para obter o objeto de descrição.
-    | chain_geradora_descricao
-
-    #* Passo 3: Formatar o objeto de descrição para uma string legível.
-    #* CORREÇÃO: O nome da função aqui deve ser o mesmo que o nome da função definida acima.
-    | RunnableLambda(formatar_saida_amigavel)
-)
-
-
-#* --- 4. Teste da Pipeline ---
-print("🚀 Executando a pipeline com saída formatada...")
-
-#* A entrada é o que o usuário final forneceria.
-resultado_formatado = pipeline_completa.invoke({"animal": "polvo"})
-
-print("\n📌 Resultado Final (Formatado):")
-print(resultado_formatado)
+# 3. Ponto de Entrada Padrão do Python
+# Este bloco garante que a função main() só será executada quando
+# o script for chamado diretamente (ex: python main.py).
+if __name__ == "__main__":
+    main()
