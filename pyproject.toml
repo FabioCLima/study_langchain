@@ -17,7 +17,6 @@ dependencies = [
     "openai>=1.93.0",
     "python-dotenv>=1.1.1",
     "requests>=2.32.4",
-    "langchain-postgres>=0.0.12",
     "langchain-chroma>=0.2.0",
     "beautifulsoup4>=4.12.2",
     "pypdf>=5.1.0",
@@ -48,43 +47,18 @@ indent-width = 4
 exclude = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__"]
 
 [tool.ruff.lint]
-select = [
-    "ASYNC",
-    "A",
-    "ANN",
-    "B",
-    "BLE",
-    "C4",
-    "C90",
-    "COM",
-    "E",
-    "EM",
-    "ERA",
-    "EXE",
-    "F",
-    "FBT",
-    "FIX",
-    "I",
-    "ICN",
-    "ISC",
-    "Q",
-    "RET",
-    "RSE",
-    "S",
-    "SIM",
-    "SLF",
-    "T10",
-    "T20",
-    "TC",
-    "TD",
-    "TRY",
-    "UP",
-    "W",
-    "YTT",
-    "RUF",
-    "N",
+select = ["ALL"]
+
+ignore = [
+    "T201",     # Permite o uso de `print`
+    "COM812",   # Permite não ter vírgula final
+    "ANN101",   # Não exige anotação de tipo para `self` em métodos
+    "D100",     # Não exige docstrings em todos os módulos
+    "D104",     # Não exige docstrings em todos os pacotes públicos
+    "D107",     # Não exige docstrings em `__init__`
 ]
-ignore = ["T201", "COM812"]
+# Para ser ainda mais moderno, você pode habilitar o preview:
+preview = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["ANN201", "S101"]
@@ -97,7 +71,7 @@ line-ending = "lf"
 [tool.ruff.lint.isort]
 # Ensina ao Ruff qual é o pacote principal do seu projeto.
 # Deve ser o mesmo nome da pasta dentro de 'src/'.
-known-first-party = ["my_package"]
+known-first-party = ["study_langchain"]
 
 
 # ============================
@@ -128,8 +102,3 @@ addopts = "-s --color=yes --tb=short"
 # os testes em `tests/` importem os módulos de `src/` sem erros.
 pythonpath = ["src"]
 testpaths = ["tests"]
-
-[dependency-groups]
-dev = [
-    "ruff>=0.12.2",
-]
