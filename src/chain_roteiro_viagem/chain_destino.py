@@ -6,12 +6,17 @@ Fluxo com múltiplas chains e parsers específicos.
 import os
 from typing import Any
 
-from dotenv import load_dotenv, find_dotenv
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from langchain_openai import ChatOpenAI
+from dotenv import find_dotenv, load_dotenv
+from langchain_core.output_parsers import (
+    JsonOutputParser,
+    PydanticOutputParser,
+    StrOutputParser,
+)
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser, StrOutputParser
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field, SecretStr
+
 
 # =============================================================================
 # Funções Utilitárias
@@ -29,6 +34,7 @@ def create_model(api_key: str) -> ChatOpenAI:
     """Cria e retorna um modelo de linguagem ChatOpenAI."""
     return ChatOpenAI(model="gpt-4.1", api_key=SecretStr(api_key))
 
+
 # =============================================================================
 # Estruturas de Dados
 # =============================================================================
@@ -37,29 +43,35 @@ class Destino(BaseModel):
     cidade: str = Field(description="Nome da cidade recomendada.")
     motivo: str = Field(description="Motivo da recomendação da cidade.")
 
+
 # Chain 2 - Lista de Restaurantes
 class Restaurante(BaseModel):
     nome: str = Field(description="Nome do restaurante.")
     tipo: str = Field(description="Tipo de culinária do restaurante.")
-    descricao: str  = Field(description="Descrição do restaurante.")
+    descricao: str = Field(description="Descrição do restaurante.")
+
 
 class ListaRestaurantes(BaseModel):
     restaurantes: list[Restaurante]
+
 
 # Chain 3 - Atrações
 class Atracao(BaseModel):
     nome: str
     descricao: str
 
+
 class ListaAtracoes(BaseModel):
     atracoes: list[Atracao]
+
 
 # =============================================================================
 # Funções para cada Chain
 # =============================================================================
-#* -------- Chain 1: Destino --------
+# * -------- Chain 1: Destino --------
 def create_parser_destino() -> JsonOutputParser:
     return JsonOutputParser(pydantic_object=Destino)
+
 
 def create_prompt_destino(parser: JsonOutputParser) -> ChatPromptTemplate:
     return ChatPromptTemplate.from_template(
@@ -69,15 +81,17 @@ def create_prompt_destino(parser: JsonOutputParser) -> ChatPromptTemplate:
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
 
+
 def create_chain_destino(model: ChatOpenAI) -> Any:
     parser = create_parser_destino()
     prompt = create_prompt_destino(parser)
     return prompt | model | parser  # type: ignore
 
 
-#* -------- Chain 2: Restaurantes --------
+# * -------- Chain 2: Restaurantes --------
 def create_parser_restaurantes() -> PydanticOutputParser[ListaRestaurantes]:
     return PydanticOutputParser(pydantic_object=ListaRestaurantes)
+
 
 def create_prompt_restaurantes(
     parser: PydanticOutputParser[ListaRestaurantes]
@@ -94,6 +108,7 @@ def create_prompt_restaurantes(
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
 
+
 def create_chain_restaurantes(model: ChatOpenAI) -> Any:
     parser = create_parser_restaurantes()
     prompt = create_prompt_restaurantes(parser)
@@ -103,6 +118,7 @@ def create_chain_restaurantes(model: ChatOpenAI) -> Any:
 # -------- Chain 3: Passeios --------
 def create_parser_passeios_culturais() -> StrOutputParser:
     return StrOutputParser()
+
 
 def create_prompt_passeios_culturais(parser: StrOutputParser) -> ChatPromptTemplate:
     return ChatPromptTemplate.from_template(
@@ -115,10 +131,12 @@ def create_prompt_passeios_culturais(parser: StrOutputParser) -> ChatPromptTempl
         - Nome do passeio 3: Descrição detalhada"""
     )
 
+
 def create_chain_passeios_culturais(model: ChatOpenAI) -> Any:
     parser = create_parser_passeios_culturais()
     prompt = create_prompt_passeios_culturais(parser)
     return prompt | model | parser  # type: ignore
+
 
 # =============================================================================
 # Função Principal
@@ -144,9 +162,9 @@ def main() -> None:
     restaurantes = chain_restaurantes.invoke({"cidade": cidade})
 
     print("\n=== Restaurantes Recomendados ===")
-    for r in restaurantes.restaurantes:  # 
+    for r in restaurantes.restaurantes:
         print(f"- {r.nome} ({r.tipo}): {r.descricao}")
-        
+
     print(f"type(restaurantes): {type(restaurantes)}")
 
     # --- Chain 3: Passeios Culturais ---
@@ -156,56 +174,56 @@ def main() -> None:
     print("\n=== Passeios Culturais ===")
     print(passeios_culturais)
     print(f"type(passeios_culturais): {type(passeios_culturais)}")
-    
-    #! Encadeamento de chains - Construção da Chain principal
-    print("\n" + "="*50)
+
+    # ! Encadeamento de chains - Construção da Chain principal
+    print("\n" + "=" * 50)
     print("=== ROTEIRO COMPLETO DE VIAGEM ===")
     print("=== Chain Encadeada do principio ao fim ===")
-    print("="*50)
-    
-    #* Chain principal que orquestra todas as outras
+    print("=" * 50)
+
+    # * Chain principal que orquestra todas as outras
     roteiro_viagem = (
         RunnablePassthrough.assign(
-            destino_info = chain_destino
+            destino_info=chain_destino
         )
         |
         RunnablePassthrough.assign(
-            sugestoes = RunnableParallel(
-                restaurantes = (
+            sugestoes=RunnableParallel(
+                restaurantes=(
                     {"cidade": lambda x: x["destino_info"]["cidade"]}
                     | chain_restaurantes
                 ),
-                passeios_culturais = (
+                passeios_culturais=(
                 {"cidade": lambda x: x["destino_info"]["cidade"]}
                 | chain_passeios_culturais
                 ),
               )
             )
         )
-    
+
     resultado_completo = roteiro_viagem.invoke({"interesse": interesse_usuario})
-    
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("=== Roteiro de Viagem Completo ===")
-    print("="*50)
-    
-    print(f"Destino: {resultado_completo['destino_info']['cidade']}")   
+    print("=" * 50)
+
+    print(f"Destino: {resultado_completo['destino_info']['cidade']}")
     print(f"Motivo: {resultado_completo['destino_info']['motivo']}")
-    
+
     print("\n=== Restaurantes Recomendados ===")
-    for r in resultado_completo['sugestoes']['restaurantes'].restaurantes:
+    for r in resultado_completo["sugestoes"]["restaurantes"].restaurantes:
         print(f"- {r.nome} ({r.tipo}): {r.descricao}")
-    
+
     print("\n=== Passeios Culturais ===")
-    print(resultado_completo['sugestoes']['passeios_culturais'])
-    
-    print("\n" + "="*50)
+    print(resultado_completo["sugestoes"]["passeios_culturais"])
+
+    print("\n" + "=" * 50)
     print("✨ Roteiro de viagem gerado com sucesso! ✨")
-    print("="*50)   
+    print("=" * 50)
+
+
 # =============================================================================
 # Execução
 # =============================================================================
 if __name__ == "__main__":
     main()
-
-  

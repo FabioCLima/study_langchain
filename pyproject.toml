@@ -1,3 +1,6 @@
+# ===================================================================
+# METADADOS E DEPENDÊNCIAS DO PROJETO
+# ===================================================================
 [project]
 name = "study-langchain"
 version = "0.1.0"
@@ -20,7 +23,7 @@ dependencies = [
     "langchain-chroma>=0.2.0",
     "beautifulsoup4>=4.12.2",
     "pypdf>=5.1.0",
-    "psycopg[binary]>=3.2.4", # Updated to include [binary] extra
+    "psycopg[binary]>=3.2.4",
     "setuptools>=75.8.0",
     "langsmith>=0.3.2",
     "langgraph-checkpoint-sqlite>=2.0.3",
@@ -32,73 +35,67 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "loguru>=0.7.3",
     "ruff-lsp>=0.0.62",
+    "pandas>=2.3.2",
 ]
+
 [project.optional-dependencies]
 dev = ["ruff", "pyright", "pytest", "pytest-xdist"]
-# ============================
-# Lint e formatação (Ruff)
-# ============================
+
+
+# ===================================================================
+# LINT E FORMATAÇÃO (RUFF)
+# ===================================================================
 [tool.ruff]
+# Configurações globais que se aplicam a tudo.
 line-length = 88
-target-version = "py313"
-fix = true
-show-fixes = true
 indent-width = 4
 exclude = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__"]
+target-version = "py313"
 
+# CORREÇÃO: 'fix' e 'show-fixes' são configurações GLOBAIS e ficam aqui.
+fix = true
+show-fixes = true
+
+# --- Seção específica para o LINTER ---
 [tool.ruff.lint]
 select = ["ALL"]
-
 ignore = [
-    "T201",     # Permite o uso de `print`
-    "COM812",   # Permite não ter vírgula final
-    "ANN101",   # Não exige anotação de tipo para `self` em métodos
-    "D100",     # Não exige docstrings em todos os módulos
-    "D104",     # Não exige docstrings em todos os pacotes públicos
-    "D107",     # Não exige docstrings em `__init__`
+    "CPY001", "T201", "COM812", "D100", "D104", "D107", "D203", "D213",
 ]
-# Para ser ainda mais moderno, você pode habilitar o preview:
 preview = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["ANN201", "S101"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["study_langchain", "movie_project"]
+
+# --- Seção específica para o FORMATADOR ---
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
 
-[tool.ruff.lint.isort]
-# Ensina ao Ruff qual é o pacote principal do seu projeto.
-# Deve ser o mesmo nome da pasta dentro de 'src/'.
-known-first-party = ["study_langchain"]
 
-
-# ============================
-# Tipagem (Pyright)
-# ============================
+# ===================================================================
+# TIPAGEM (PYRIGHT)
+# ===================================================================
 [tool.pyright]
 typeCheckingMode = "strict"
 pythonVersion = "3.13"
-include = ["src", 'tests']
+include = ["src", "tests"]
 exclude = [
-    "**/venv",
-    "**/.venv",
-    "**/env",
-    "**/.env",
-    "**/node_modules",
-    "**/__pycache__",
+    "**/venv", "**/.venv", "**/env", "**/.env", "**/node_modules", "**/__pycache__",
 ]
 venv = ".venv"
 venvPath = "."
 executionEnvironments = [{ root = "src" }]
 
-# ============================
-# Testes (Pytest)
-# ============================
+
+# ===================================================================
+# TESTES (PYTEST)
+# ===================================================================
 [tool.pytest.ini_options]
 addopts = "-s --color=yes --tb=short"
-# Adiciona 'src' ao path do Python durante os testes. Isso permite que
-# os testes em `tests/` importem os módulos de `src/` sem erros.
 pythonpath = ["src"]
 testpaths = ["tests"]
