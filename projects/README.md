@@ -1,221 +1,137 @@
-# 🚀 LangChain Projects
+# Projeto RAG de Recomendação de Filmes com LangChain
 
-This folder contains **complete, production-ready projects** that demonstrate real-world applications of LangChain concepts.
+Este projeto demonstra a construção de um assistente de recomendação de filmes utilizando a arquitetura **RAG (Retrieval-Augmented Generation)** com a biblioteca LangChain. A aplicação supera as limitações de um LLM genérico, fornecendo recomendações precisas e contextualizadas, baseadas em uma base de conhecimento controlada.
 
-## 📁 **PROJECT OVERVIEW**
+## ✨ Funcionalidades
 
-### 🤖 **chatbot/** - Conversational AI
-**What it does:** Production-ready chatbot with memory and personality  
-**Key Technologies:** LangChain Memory, Conversation Management, LCEL  
-**Entry Point:** `src/simple_chatbot.py`  
-**Difficulty:** ⭐⭐⭐
+* **Recomendações Baseadas em Dados:** As sugestões são geradas a partir de um catálogo de filmes pré-definido (`movie_catalog.json`), garantindo precisão e evitando "alucinações".
+* **Busca Semântica:** Utiliza embeddings e um `VectorStore` para encontrar os filmes mais relevantes baseados no significado da descrição do usuário, não apenas em palavras-chave.
+* **Interface Interativa:** Um chatbot de terminal permite que o usuário converse com o assistente e peça múltiplas recomendações.
+* **Geração de Catálogo Dinâmica:** Inclui um script auxiliar que usa um LLM para gerar dinamicamente o catálogo de filmes, tornando a criação da base de conhecimento rápida e escalável.
 
-**Features:**
-- Conversation memory management
-- Personality customization
-- Error handling and recovery
-- Production-ready architecture
+## 🏛️ Arquitetura da Solução
 
-**Files:**
+O projeto é dividido em dois fluxos arquiteturais principais: um processo offline para preparação dos dados e um processo online para interação com o usuário.
+
+**1. Fluxo de Geração de Dados (Offline)**
+Este fluxo é executado uma única vez para criar a base de conhecimento.
+
+`[Execução de gerar_catalogo.py]` → `[Input de Gênero]` → `[Chain Geradora (Prompt | LLM | Parser)]` → `[Criação do data/movie_catalog.json]`
+
+**2. Fluxo da Aplicação RAG (Online)**
+Este é o fluxo principal da aplicação, que é executado para interagir com o usuário.
+
+`[Execução de main.py]` → `[Setup (Carregar JSON → Indexar no VectorStore → Criar Chain)]` → `[Loop Interativo]`
+
+O ciclo RAG dentro do loop funciona da seguinte forma:
+`[Pergunta do Usuário]` → `[Retriever busca no VectorStore]` → `[Contexto + Pergunta]` → `[Prompt Formatado]` → `[LLM Gera Resposta]`
+
+## 📁 Estrutura do Projeto
+
 ```
-chatbot/
-├── src/
-│   └── simple_chatbot.py     # Main chatbot implementation
-├── data/                     # Sample conversations
-├── docs/                     # Documentation
-└── tests/                    # Unit tests
-```
-
-### 🌍 **travel_agent/** - AI Travel Planner
-**What it does:** Intelligent travel planning with recommendations  
-**Key Technologies:** Chain Composition, Output Parsers, Multi-step Workflows  
-**Entry Point:** `src/chain_destino.py`  
-**Difficulty:** ⭐⭐⭐⭐
-
-**Features:**
-- Destination recommendations based on interests
-- Restaurant suggestions with structured output
-- Cultural activity planning
-- Complex chain orchestration
-
-**Files:**
-```
-travel_agent/
-├── src/
-│   └── chain_destino.py      # Main travel planning logic
-├── data/                     # Travel data and samples
-├── docs/                     # Project documentation
-└── tests/                    # Integration tests
+movie_project_rag/
+├── .env
+├── data/
+│   └── movie_catalog.json
+├── core/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── logger.py
+│   ├── models.py
+│   └── rag_chain.py
+├── gerar_catalogo.py
+└── main.py
 ```
 
-### 😊 **sentiment_analyzer/** - Text Sentiment Analysis
-**What it does:** Advanced sentiment analysis with structured output  
-**Key Technologies:** Pydantic Output Parsers, Text Processing  
-**Entry Point:** `src/analisador_de_sentimento.py`  
-**Difficulty:** ⭐⭐
+## 🚀 Módulos do Projeto (Deep Dive)
 
-**Features:**
-- Multi-dimensional sentiment analysis
-- Confidence scoring
-- Structured JSON output
-- Portuguese language support
+Cada módulo foi projetado com uma responsabilidade única para manter o código organizado e manutenível.
 
-**Files:**
-```
-sentiment_analyzer/
-├── src/
-│   └── analisador_de_sentimento.py  # Sentiment analysis engine
-├── data/                            # Sample texts
-├── docs/                            # Usage documentation
-└── tests/                           # Test cases
-```
+### `core/settings.py`
+* **Responsabilidade:** Gerenciar configurações da aplicação de forma centralizada.
+* **Detalhes:** Utiliza `pydantic-settings` para carregar configurações de variáveis de ambiente, como o `LOG_LEVEL`. Isso permite alterar o comportamento da aplicação sem modificar o código.
 
-### 📚 **rag_system/** - Document Q&A System
-**What it does:** Question-answering system over documents  
-**Key Technologies:** RAG, Vector Embeddings, Document Processing  
-**Entry Point:** *Coming from learning/03_integration/files/*  
-**Difficulty:** ⭐⭐⭐⭐⭐
+### `core/logger.py`
+* **Responsabilidade:** Configurar uma instância de logger padronizada para todo o projeto.
+* **Detalhes:** Utiliza a biblioteca `loguru` para criar logs formatados, coloridos e fáceis de ler, com base no nível definido em `settings.py`.
 
-**Features:**
-- Document ingestion and processing
-- Vector similarity search
-- Context-aware question answering
-- Multiple document format support
+### `core/models.py`
+* **Responsabilidade:** Definir os "contratos de dados" da aplicação.
+* **Detalhes:** Utiliza Pydantic para criar modelos como `Filme` e `CatalogoFilmes`. Esses modelos garantem que os dados (seja lendo do JSON ou recebendo de um LLM) tenham uma estrutura validada e consistente.
 
-**Files:**
-```
-rag_system/
-├── src/                     # RAG implementation
-├── data/                    # Sample documents
-├── docs/                    # System documentation
-└── tests/                   # RAG tests
-```
+### `gerar_catalogo.py`
+* **Responsabilidade:** Ser um script utilitário e independente para criar a base de conhecimento (`data/movie_catalog.json`).
+* **Detalhes:** É uma ferramenta de setup. Ele interage com o usuário para pedir um gênero de filme e, em seguida, utiliza uma chain LangChain (`Prompt | LLM | PydanticOutputParser`) para gerar uma lista estruturada de filmes e salvá-la em um arquivo JSON.
 
-## 🎯 **HOW TO USE PROJECTS**
+### `core/rag_chain.py`
+* **Responsabilidade:** O cérebro da lógica RAG. Encapsula toda a complexidade de carregar, indexar e construir a chain de recomendação.
+* **Detalhes:**
+    * `load_catalog()`: Carrega os dados do `movie_catalog.json` usando `pathlib` para garantir a portabilidade do caminho do arquivo. Valida os dados carregados, transformando-os em uma lista de objetos Pydantic `Filme`.
+    * `create_vector_store()`: Realiza a etapa de **Indexação**. Transforma cada objeto `Filme` em um `Document` LangChain, gera os embeddings para as sinopses e os armazena em um `InMemoryVectorStore`.
+    * `create_rag_chain()`: Constrói a chain RAG final usando a LangChain Expression Language (LCEL). Utiliza um `RunnableParallel` para buscar o contexto (`retriever`) e passar a pergunta do usuário (`RunnablePassthrough`) simultaneamente para o prompt, que então alimenta o LLM para a geração da resposta final.
 
-### 1. **Choose Based on Your Level**
-- **Beginner**: Start with `sentiment_analyzer/`
-- **Intermediate**: Try `chatbot/` 
-- **Advanced**: Build `travel_agent/`
-- **Expert**: Implement `rag_system/`
+### `main.py`
+* **Responsabilidade:** Ponto de entrada (`entrypoint`) e orquestração da aplicação.
+* **Detalhes:**
+    1.  Adiciona a raiz do projeto ao `sys.path` para garantir que os imports funcionem de forma robusta.
+    2.  Executa a fase de **Setup**: chama as funções de `core/rag_chain.py` para carregar os dados, criar o `VectorStore` e montar a chain RAG.
+    3.  Inicia um **Loop Interativo**: aguarda a entrada do usuário, invoca a chain RAG com a pergunta e exibe a resposta, até que o usuário decida sair.
 
-### 2. **Project Structure**
-Each project follows the same structure:
-```
-project_name/
-├── README.md            # Project-specific documentation
-├── requirements.txt     # Additional dependencies
-├── src/                 # Source code
-├── data/               # Sample data and inputs
-├── docs/               # Detailed documentation
-└── tests/              # Test suite
-```
+## ⚙️ Instalação e Uso
 
-### 3. **Running Projects**
+Siga os passos abaixo para executar o projeto.
+
+### Pré-requisitos
+* Python 3.10+
+
+### 1. Clone o Repositório
 ```bash
-# Navigate to project
-cd projects/chatbot
-
-# Check requirements
-cat requirements.txt
-
-# Run the main file
-python src/simple_chatbot.py
+git clone <url-do-seu-repositorio>
+cd movie_project_rag
 ```
 
-## 🔗 **PROJECT RELATIONSHIPS**
-
-### **Learning Path Integration:**
-```
-learning/01_fundamentals → projects/sentiment_analyzer
-learning/02_advanced     → projects/chatbot  
-learning/03_integration  → projects/rag_system
-learning/04_patterns     → projects/travel_agent
-```
-
-### **Complexity Progression:**
-```
-sentiment_analyzer (⭐⭐) 
-       ↓
-   chatbot (⭐⭐⭐)
-       ↓  
-  travel_agent (⭐⭐⭐⭐)
-       ↓
-   rag_system (⭐⭐⭐⭐⭐)
-```
-
-## 📚 **PROJECT LEARNING OBJECTIVES**
-
-### **chatbot/**
-- Memory management patterns
-- Conversation flow design
-- Error handling strategies
-- Production deployment considerations
-
-### **travel_agent/**
-- Multi-step workflow orchestration
-- Complex chain composition
-- Structured output management
-- Real-world data processing
-
-### **sentiment_analyzer/**
-- Text processing fundamentals
-- Output parser patterns
-- Validation and error handling
-- Structured data export
-
-### **rag_system/**
-- Vector database integration
-- Document processing pipelines
-- Retrieval-augmented generation
-- Scalable architecture design
-
-## 🚀 **QUICK START**
-
-### **For Beginners:**
+### 2. Crie um Ambiente Virtual e Instale as Dependências
 ```bash
-cd projects/sentiment_analyzer/src
-python analisador_de_sentimento.py
+python -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+*(Nota: Para criar o arquivo `requirements.txt`, execute `pip freeze > requirements.txt` no seu ambiente ativado.)*
+
+### 3. Configure as Variáveis de Ambiente
+Crie um arquivo chamado `.env` na raiz do projeto e adicione sua API Key da OpenAI:
+```
+OPENAI_API_KEY="sk-..."
 ```
 
-### **For Intermediate:**
+### 4. Uso da Aplicação
+
+**Passo 1: Gerar o Catálogo de Filmes**
+Primeiro, execute o script para criar a sua base de conhecimento.
 ```bash
-cd projects/chatbot/src  
-python simple_chatbot.py
+python gerar_catalogo.py
 ```
+O script irá pedir para você digitar um gênero de filme. Após a execução, um arquivo `data/movie_catalog.json` será criado.
 
-### **For Advanced:**
+**Passo 2: Executar o Assistente de Recomendação**
+Com o catálogo criado, inicie a aplicação principal.
 ```bash
-cd projects/travel_agent/src
-python chain_destino.py
+python main.py
 ```
+Aguarde as mensagens de setup. Quando o assistente estiver pronto, descreva o tipo de filme que você procura e pressione Enter. Para sair, digite `sair`.
 
-## 💡 **PROJECT EXTENSION IDEAS**
+## 💡 Conceitos Chave
 
-### **chatbot/**
-- Add web interface
-- Implement multiple personalities
-- Add voice input/output
-- Deploy to messaging platforms
+Este projeto demonstra vários conceitos importantes de IA e engenharia de software:
+* **Arquitetura RAG:** Para reduzir alucinações e basear as respostas do LLM em fontes de dados confiáveis.
+* **LangChain Expression Language (LCEL):** Para compor `chains` de forma declarativa e poderosa.
+* **Separação de Responsabilidades:** Cada módulo tem um propósito claro, tornando o código mais limpo e modular.
+* **Validação de Dados com Pydantic:** Para garantir a integridade e a estrutura dos dados em todo o fluxo da aplicação.
+* **Robustez e Portabilidade:** Uso de `pathlib` e manipulação do `sys.path` para criar uma aplicação que funciona de forma consistente em diferentes ambientes.
 
-### **travel_agent/**
-- Add budget optimization
-- Include weather data
-- Build web dashboard
-- Add booking integrations
+## 🔮 Melhorias Futuras
 
-### **sentiment_analyzer/**
-- Add emotion detection
-- Support multiple languages
-- Build real-time API
-- Add visualization dashboard
-
-### **rag_system/**
-- Add multi-modal support
-- Implement semantic search
-- Build web interface
-- Add document versioning
-
----
-
-**Ready to build?** Choose a project and dive in!
+* **Persistência do VectorStore:** Substituir o `InMemoryVectorStore` por uma solução persistente como `ChromaDB` ou `FAISS` para que o índice não precise ser recriado a cada execução.
+* **Memória Conversacional:** Adicionar memória à `chain` para que o assistente se lembre de interações passadas na mesma sessão.
+* **Interface Gráfica:** Criar uma interface web simples usando `Streamlit` ou `FastAPI` para tornar a interação mais amigável.
+* **Metadados Ricos:** Expandir os metadados dos filmes no catálogo (adicionando ano, diretor, gênero, etc.) para permitir buscas e filtros mais complexos.
