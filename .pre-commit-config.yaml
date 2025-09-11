@@ -1,0 +1,44 @@
+# .pre-commit-config.yaml
+repos:
+  # Ruff - Linting e formatação
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.4
+    hooks:
+      # Linting
+      - id: ruff
+        args: [--fix]
+      # Formatação
+      - id: ruff-format
+
+  # Black - Formatação de código (alternativa ao ruff format)
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        args: [--line-length=88]
+
+  # isort - Organização de imports
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+
+  # MyPy - Verificação de tipos
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-requests]
+        args: [--strict, --ignore-missing-imports]
+
+  # Hooks adicionais úteis
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements

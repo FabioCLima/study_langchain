@@ -36,6 +36,8 @@ dependencies = [
     "loguru>=0.7.3",
     "ruff-lsp>=0.0.62",
     "pandas>=2.3.2",
+    "pre-commit>=4.3.0",
+    "pygraphviz>=1.14",
 ]
 
 [project.optional-dependencies]
@@ -99,3 +101,89 @@ executionEnvironments = [{ root = "src" }]
 addopts = "-s --color=yes --tb=short"
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+# ===================================================================
+# BLACK - FORMATAÇÃO
+# ===================================================================
+[tool.black]
+line-length = 88
+target-version = ['py313']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | venv
+    | env
+  )/
+)
+'''
+
+# ===================================================================
+# ISORT - ORGANIZAÇÃO DE IMPORTS
+# ===================================================================
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+known_first_party = ["study_langchain", "movie_project"]
+skip = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__"]
+
+# ===================================================================
+# MYPY - VERIFICAÇÃO DE TIPOS
+# ===================================================================
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+# Diretórios
+files = ["src", "tests"]
+exclude = [
+    "venv",
+    ".venv",
+    "env",
+    ".env",
+    "node_modules",
+    "__pycache__"
+]
+
+# Configurações por módulo
+[[tool.mypy.overrides]]
+module = [
+    "langchain.*",
+    "langchain_community.*",
+    "langchain_openai.*",
+    "langchain_postgres.*",
+    "langchain_chroma.*",
+    "langgraph.*",
+    "beautifulsoup4.*",
+    "pypdf.*",
+    "psycopg.*",
+    "duckduckgo_search.*",
+    "grandalf.*"
+]
+ignore_missing_imports = true
