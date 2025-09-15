@@ -47,16 +47,22 @@ print("✅ Célula 2: Modelo LLM instanciado.")
 # Nenhuma mudança aqui, Pydantic continua sendo o padrão ouro para estruturação de dados.
 class Destino(BaseModel):
     cidade: str = Field(description="A cidade recomendada para visitar.")
-    motivo: str = Field(description="Motivo pelo qual é interessante visitar essa cidade.")
+    motivo: str = Field(
+        description="Motivo pelo qual é interessante visitar essa cidade."
+    )
 
 
 class Restaurantes(BaseModel):
-    sugestoes: list[str] = Field(description="Uma lista com nomes de 3 a 5 restaurantes recomendados.")
+    sugestoes: list[str] = Field(
+        description="Uma lista com nomes de 3 a 5 restaurantes recomendados."
+    )
 
 
 # Adicionamos uma nova chain para a previsão do tempo, como sugerido no plano de estudos.
 class PrevisaoTempo(BaseModel):
-    previsao: str = Field(description="Uma breve previsão do tempo para a cidade, incluindo temperatura média e condições.")
+    previsao: str = Field(
+        description="Uma breve previsão do tempo para a cidade, incluindo temperatura média e condições."
+    )
 
 
 print("✅ Célula 3: Modelos Pydantic definidos.")
@@ -118,18 +124,21 @@ print("✅ Célula 4: Funções de criação de chains prontas.")
 # Composição da Chain Principal com `RunnablePassthrough.assign`
 # Esta é a forma mais moderna e legível de compor chains que enriquecem o contexto.
 
-roteiro_chain_completa = RunnablePassthrough.assign(
-    # A primeira etapa usa o input original {"interesse": "..."} e adiciona a chave "destino"
-    destino=criar_chain_sugestao_destino()
-).assign(
-    # As próximas etapas usam o contexto já existente (que agora contém "destino")
-    # para popular novas chaves em paralelo.
-    restaurantes=itemgetter("destino") | criar_chain_sugestao_restaurantes(),
-    passeios=itemgetter("destino") | criar_chain_sugestao_passeios(),
-    previsao=itemgetter("destino") | criar_chain_previsao_tempo(),
-    # Mantemos o interesse original para o resumo final
-    interesse=itemgetter("interesse")
-) | criar_chain_resumo_final()
+roteiro_chain_completa = (
+    RunnablePassthrough.assign(
+        # A primeira etapa usa o input original {"interesse": "..."} e adiciona a chave "destino"
+        destino=criar_chain_sugestao_destino()
+    ).assign(
+        # As próximas etapas usam o contexto já existente (que agora contém "destino")
+        # para popular novas chaves em paralelo.
+        restaurantes=itemgetter("destino") | criar_chain_sugestao_restaurantes(),
+        passeios=itemgetter("destino") | criar_chain_sugestao_passeios(),
+        previsao=itemgetter("destino") | criar_chain_previsao_tempo(),
+        # Mantemos o interesse original para o resumo final
+        interesse=itemgetter("interesse"),
+    )
+    | criar_chain_resumo_final()
+)
 
 print("✅ Célula 5: Chain principal composta com `assign`.")
 
@@ -153,7 +162,9 @@ async def gerar_roteiro_streaming(interesse_usuario: str):
     return full_response
 
 
-print("✅ Célula 6: Função de execução assíncrona pronta. Execute a célula abaixo para começar!")
+print(
+    "✅ Célula 6: Função de execução assíncrona pronta. Execute a célula abaixo para começar!"
+)
 
 # --- [CÉLULA 7] ---
 # Invocando o Roteiro

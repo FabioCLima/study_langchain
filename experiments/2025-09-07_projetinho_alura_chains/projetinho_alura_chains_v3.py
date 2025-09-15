@@ -168,8 +168,7 @@ def exibir_roteiro(roteiro: dict) -> None:
 
 
 def main() -> None:
-    """Função principal que orquestra a criação e execução da chain completa.
-    """
+    """Função principal que orquestra a criação e execução da chain completa."""
     # 1. Criação das chains individuais
     chain_destino = criar_chain_sugestao_destino()
     chain_restaurantes = criar_chain_sugestao_restaurantes()

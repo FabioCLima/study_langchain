@@ -38,6 +38,7 @@ dependencies = [
     "pandas>=2.3.2",
     "pre-commit>=4.3.0",
     "pygraphviz>=1.14",
+    "wikipedia>=1.4.0",
 ]
 
 [project.optional-dependencies]
