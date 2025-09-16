@@ -1,10 +1,12 @@
-""" Carregando variáveis de ambiente e configurando o modelo de linguagem """
+"""Carregando variáveis de ambiente e configurando o modelo de linguagem"""
 
 import os
-from typing import Union, cast
-from dotenv import load_dotenv, find_dotenv
+from typing import cast
+
+from dotenv import find_dotenv, load_dotenv
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
+
 
 def load_environment_variables() -> SecretStr:
     """Carrega a chave da API do OpenAI das variáveis de ambiente.
@@ -14,6 +16,7 @@ def load_environment_variables() -> SecretStr:
         
     Raises:
         ValueError: Se a chave da API não for encontrada
+
     """
     load_dotenv(find_dotenv())
     api_key = os.getenv("OPENAI_API_KEY")
@@ -21,7 +24,8 @@ def load_environment_variables() -> SecretStr:
         raise ValueError("OPENAI_API_KEY não encontrada no arquivo .env")
     return SecretStr(api_key)
 
-def create_model(api_key: Union[str, SecretStr]) -> ChatOpenAI:
+
+def create_model(api_key: str | SecretStr) -> ChatOpenAI:
     """Cria uma instância do modelo ChatOpenAI.
     
     Args:
@@ -29,6 +33,7 @@ def create_model(api_key: Union[str, SecretStr]) -> ChatOpenAI:
         
     Returns:
         ChatOpenAI: Instância configurada do modelo
+
     """
     if isinstance(api_key, str):
         api_key = SecretStr(api_key)
@@ -41,7 +46,7 @@ if __name__ == "__main__":
         openai_api_key = load_environment_variables()
         model = create_model(openai_api_key)
         response = model.invoke("Qual é o local onde surgiu a primeira civilização??")
-        print(cast(str, response.content))
+        print(cast("str", response.content))
     except ValueError as e:
         print(f"Erro: {e}")
     except Exception as e:

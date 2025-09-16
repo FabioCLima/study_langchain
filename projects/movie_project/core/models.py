@@ -1,22 +1,20 @@
 # core/models.py
-"""
-Módulo para definir as estruturas de dados (modelos Pydantic) do projeto.
+"""Módulo para definir as estruturas de dados (modelos Pydantic) do projeto.
 
 Estes modelos são usados para garantir que a saída do LLM seja estruturada,
 confiável e fácil de usar no restante da aplicação.
 """
 
-from typing import List
+
 from pydantic import BaseModel, Field
 
 
 class MovieList(BaseModel):
-    """
-    Um modelo de dados que representa uma lista simples de títulos de filmes.
+    """Um modelo de dados que representa uma lista simples de títulos de filmes.
     Este é o nosso primeiro modelo, focado apenas em obter os nomes.
     """
 
-    movies: List[str] = Field(
+    movies: list[str] = Field(
         ...,
         description=(
             "Uma lista contendo os títulos dos filmes. "
@@ -24,16 +22,17 @@ class MovieList(BaseModel):
         ),
     )
 
+
 # --- NOSSO NOVO MODELO DE DADOS ---
 class MovieInfoData(BaseModel):
+    """Estrutura de dados para armazenar informações detalhadas sobre um único filme.
     """
-    Estrutura de dados para armazenar informações detalhadas sobre um único filme.
-    """
+
     title: str = Field(..., description="O título oficial do filme.")
 
     director: str = Field(..., description="O nome do diretor principal do filme.")
 
-    main_actors: List[str] = Field(
+    main_actors: list[str] = Field(
         ..., description="Uma lista com os nomes dos 3 a 5 atores principais."
     )
 

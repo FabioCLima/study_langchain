@@ -1,17 +1,18 @@
-"""
-Configuração centralizada do Loguru para o projeto.
+"""Configuração centralizada do Loguru para o projeto.
 
 - Loga no console com cores
 - Salva logs em arquivo rotacionado diariamente
 - Mantém logs por 7 dias
 """
 
-from loguru import logger
-import sys
 import os
+import sys
+
+from loguru import logger
 
 # Criar pasta de logs se não existir
 os.makedirs("logs", exist_ok=True)
+
 
 def setup_logger() -> None:
     # Remove configuração padrão
@@ -39,6 +40,7 @@ def setup_logger() -> None:
     )
 
     return logger
+
 
 # Instância global
 project_logger: "logger.__class__" = logger

@@ -1,12 +1,11 @@
-"""
-Chain - Passeios Culturais
+"""Chain - Passeios Culturais
 A partir da cidade recomendada, a chain retorna uma lista de passeios culturais.
 """
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from models.pydantic_models import ListaAtracoes
 from utils.logger_setup import project_logger  # Loguru
@@ -16,8 +15,7 @@ if TYPE_CHECKING:
 
 
 def create_chain_passeios_culturais(model: ChatOpenAI) -> Callable[[dict[str, Any]], ListaAtracoes]:
-    """
-    Cria uma chain que, a partir de uma cidade, retorna uma lista de passeios culturais,
+    """Cria uma chain que, a partir de uma cidade, retorna uma lista de passeios culturais,
     formatada de acordo com o modelo Pydantic ListaAtracoes.
     """
     parser = PydanticOutputParser(pydantic_object=ListaAtracoes)
@@ -43,4 +41,3 @@ def create_chain_passeios_culturais(model: ChatOpenAI) -> Callable[[dict[str, An
         return output
 
     return run_with_logging
-

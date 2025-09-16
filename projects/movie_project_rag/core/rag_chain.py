@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import List
 
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
@@ -20,23 +19,23 @@ PROJECT_ROOT = Path(__file__).parent.parent
 CATALOG_FILEPATH = PROJECT_ROOT / "data" / "movie_catalog.json"
 # ---------------------------------------------
 
-def load_catalog(filepath: Path = CATALOG_FILEPATH) -> List[Filme]:
-    """
-    Carrega o catálogo de filmes a partir do arquivo JSON, validando os dados
+
+def load_catalog(filepath: Path = CATALOG_FILEPATH) -> list[Filme]:
+    """Carrega o catálogo de filmes a partir do arquivo JSON, validando os dados
     e retornando uma lista de objetos Pydantic 'Filme'.
     O caminho para o arquivo é lido da constante do módulo.
     """
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             data = json.load(f)
-        
-        #* Pega a lista de dicionários da chave "filmes"
+
+        # * Pega a lista de dicionários da chave "filmes"
         movie_dicts = data.get("filmes", [])
-        
-        #* Converte cada dicionário em um objeto Pydantic Filme.
-        #* Isso também valida se os dados no JSON estão corretos!
+
+        # * Converte cada dicionário em um objeto Pydantic Filme.
+        # * Isso também valida se os dados no JSON estão corretos!
         catalog = [Filme(**movie_data) for movie_data in movie_dicts]
-        
+
         logger.info(f"Catálogo com {len(catalog)} filmes carregado e validado com sucesso de '{filepath.name}'.")
         return catalog
     except FileNotFoundError:
@@ -46,12 +45,12 @@ def load_catalog(filepath: Path = CATALOG_FILEPATH) -> List[Filme]:
         logger.error(f"Erro ao decodificar o JSON do arquivo {filepath}")
         return []
 
-#! --- As outras funções do RAG virão aqui ---
+# ! --- As outras funções do RAG virão aqui ---
 # Em core/rag_chain.py, adicione esta função abaixo de load_catalog
 
-def create_vector_store(movies: List[Filme]) -> InMemoryVectorStore:
-    """
-    Cria um VectorStore em memória a partir de uma lista de filmes.
+
+def create_vector_store(movies: list[Filme]) -> InMemoryVectorStore:
+    """Cria um VectorStore em memória a partir de uma lista de filmes.
     """
     if not movies:
         logger.warning("A lista de filmes está vazia. Nenhum VectorStore será criado.")
@@ -79,16 +78,16 @@ def create_vector_store(movies: List[Filme]) -> InMemoryVectorStore:
         documents=documents,
         embedding=embeddings
     )
-    
+
     logger.info("VectorStore criado com sucesso!")
     return vector_store
 
-#! --- As outras funções do RAG virão aqui ---
+# ! --- As outras funções do RAG virão aqui ---
 # Em core/rag_chain.py, adicione esta função final
 
+
 def create_rag_chain(vector_store: InMemoryVectorStore):
-    """
-    Cria e retorna uma chain RAG completa.
+    """Cria e retorna uma chain RAG completa.
     """
     logger.info("Criando a chain RAG...")
 
@@ -118,8 +117,8 @@ def create_rag_chain(vector_store: InMemoryVectorStore):
     # 3. O Modelo LLM: O cérebro que gera a resposta final.
     model = ChatOpenAI(model="gpt-4o", temperature=0)
 
-    #* Função auxiliar para formatar os documentos recuperados em uma única string
-    def format_docs(docs: List[Document]) -> str:
+    # * Função auxiliar para formatar os documentos recuperados em uma única string
+    def format_docs(docs: list[Document]) -> str:
         return "\n\n".join(f"Título: {doc.metadata['title']}\nSinopse: {doc.page_content}" for doc in docs)
 
     # 4. A Chain RAG com LCEL

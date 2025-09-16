@@ -1,5 +1,4 @@
-"""
-Entrega de um roteiro de viagem completo
+"""Entrega de um roteiro de viagem completo
 Executa o fluxo principal do projeto:
 - Recebe interesse de atividade do usuário
 - Gera destino sugerido
@@ -7,23 +6,22 @@ Executa o fluxo principal do projeto:
 """
 
 import argparse
-from config import settings
-from utils.llm_setup import load_environment_variables, create_model
+
 from chains.orchestrador import create_main_chain
+from utils.llm_setup import create_model, load_environment_variables
 from utils.logger_setup import project_logger
 
 
 def format_and_print_roteiro(resultado: dict) -> None:
-    """
-    Formata e apresenta o resultado final no terminal.
+    """Formata e apresenta o resultado final no terminal.
     Aceita tanto objetos Pydantic quanto dicionários.
     """
     print("\n" + "=" * 50)
     print("✨ ROTEIRO DE VIAGEM GERADO COM SUCESSO! ✨")
     print("=" * 50)
 
-    destino_info = resultado.get('destino_info', {})
-    sugestoes = resultado.get('sugestoes', {})
+    destino_info = resultado.get("destino_info", {})
+    sugestoes = resultado.get("sugestoes", {})
 
     # Tratamento seguro para Pydantic ou dict
     cidade = getattr(destino_info, "cidade", destino_info.get("cidade", "N/A"))
@@ -32,7 +30,7 @@ def format_and_print_roteiro(resultado: dict) -> None:
     print(f"\n📍 Destino Recomendado: {cidade}")
     print(f"   Motivo: {motivo}")
 
-    restaurantes = sugestoes.get('restaurantes')
+    restaurantes = sugestoes.get("restaurantes")
     if restaurantes:
         print("\n🍴 Restaurantes Recomendados:")
         lista_restaurantes = getattr(restaurantes, "restaurantes", restaurantes.get("restaurantes", []))
@@ -42,7 +40,7 @@ def format_and_print_roteiro(resultado: dict) -> None:
             descricao = getattr(r, "descricao", r.get("descricao"))
             print(f"   - {nome} ({tipo}): {descricao}")
 
-    passeios = sugestoes.get('passeios_culturais')
+    passeios = sugestoes.get("passeios_culturais")
     if passeios:
         print("\n🏛️ Passeios Culturais:")
         lista_passeios = getattr(passeios, "atracoes", passeios.get("atracoes", []))

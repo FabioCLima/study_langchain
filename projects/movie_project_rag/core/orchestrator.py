@@ -1,27 +1,23 @@
 # core/orchestrator.py
-'''
-Pense em um "grafo" como um fluxograma de processamento de dados, onde cada caixa é uma tarefa e as setas indicam como os dados fluem.
-'''
+"""Pense em um "grafo" como um fluxograma de processamento de dados, onde cada caixa é uma tarefa e as setas indicam como os dados fluem.
+"""
 
 
-from typing import List, Dict
 from langchain_core.runnables import RunnablePassthrough
-from core.models import MovieList
 
-from core.chain_suggestion import create_movie_suggestion_chain
 from core.chain_details import create_movie_details_chain
+from core.chain_suggestion import create_movie_suggestion_chain
+from core.models import MovieList
 
 
 def create_movie_analysis_graph():
-    """
-    Orquestra múltiplas chains para criar um grafo que analisa filmes por gênero.
+    """Orquestra múltiplas chains para criar um grafo que analisa filmes por gênero.
     """
     suggestion_chain = create_movie_suggestion_chain()
     details_chain = create_movie_details_chain()
 
-    def extract_titles_for_mapping(input_dict: dict) -> List[Dict[str, str]]:
-        """
-        Pega o dicionário de estado, extrai a lista de filmes
+    def extract_titles_for_mapping(input_dict: dict) -> list[dict[str, str]]:
+        """Pega o dicionário de estado, extrai a lista de filmes
         e a prepara para o .map() da próxima chain.
         """
         movie_list: MovieList = input_dict["suggestion_result"]
@@ -45,4 +41,4 @@ def create_movie_analysis_graph():
         )
     )
 
-    return final_graph #type: ignore
+    return final_graph  # type: ignore

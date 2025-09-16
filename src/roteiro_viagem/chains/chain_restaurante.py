@@ -1,12 +1,11 @@
-"""
-Chain - Restaurantes
+"""Chain - Restaurantes
 A partir da cidade recomendada, a chain retorna uma lista de restaurantes.
 """
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from models.pydantic_models import ListaRestaurantes
 from utils.logger_setup import project_logger  # Loguru
@@ -16,8 +15,7 @@ if TYPE_CHECKING:
 
 
 def create_chain_restaurantes(model: ChatOpenAI) -> Callable[[dict[str, Any]], ListaRestaurantes]:
-    """
-    Cria uma chain que, dada uma cidade, sugere uma lista de restaurantes
+    """Cria uma chain que, dada uma cidade, sugere uma lista de restaurantes
     formatada de acordo com o modelo Pydantic ListaRestaurantes.
     """
     parser = PydanticOutputParser(pydantic_object=ListaRestaurantes)

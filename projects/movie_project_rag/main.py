@@ -6,13 +6,13 @@ from pathlib import Path
 # Isso garante que o Python sempre encontre o módulo 'core'
 sys.path.append(str(Path(__file__).parent))
 
-from dotenv import load_dotenv
 from core.logger import logger
-from core.rag_chain import load_catalog, create_vector_store, create_rag_chain
+from core.rag_chain import create_rag_chain, create_vector_store, load_catalog
+from dotenv import load_dotenv
+
 
 def main():
-    """
-    Função principal que orquestra a aplicação RAG de recomendação de filmes.
+    """Função principal que orquestra a aplicação RAG de recomendação de filmes.
     """
     # 1. Fase de Setup
     # Carrega as variáveis de ambiente (API Key)
@@ -42,7 +42,7 @@ def main():
         question = input("\n> Descreva o tipo de filme que você gostaria de ver (ou digite 'sair' para terminar): ")
 
         # Condição de saída do loop
-        if question.lower() == 'sair':
+        if question.lower() == "sair":
             break
 
         # Invoca a chain com a pergunta do usuário

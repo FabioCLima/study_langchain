@@ -2,15 +2,16 @@
 import argparse
 import random
 import re
-import pandas as pd  # 1. Importamos o pandas
 
-from core.settings import setup_environment, settings
+import pandas as pd  # 1. Importamos o pandas
+from core.settings import settings, setup_environment
+
 setup_environment()
 
-from core.orchestrator import create_movie_analysis_graph
+
 from core.logger import logger
 from core.models import MovieInfoData
-from typing import List
+from core.orchestrator import create_movie_analysis_graph
 
 
 def sanitize_filename(text: str) -> str:
@@ -22,8 +23,7 @@ def sanitize_filename(text: str) -> str:
 
 
 def main(genre: str):
-    """
-    Função principal que executa o grafo de análise de filmes e salva os resultados.
+    """Função principal que executa o grafo de análise de filmes e salva os resultados.
     """
     logger.info(f"🚀 Iniciando a análise completa de filmes do gênero: '{genre}'")
 
@@ -32,8 +32,8 @@ def main(genre: str):
         logger.info("Invocando o grafo com o LLM (isso pode levar um tempo)...")
         graph_result = movie_graph.invoke({"genre": genre})
 
-        suggested_movies = graph_result['suggestion_result'].movies
-        detailed_results: List[MovieInfoData] = graph_result['detailed_results']
+        suggested_movies = graph_result["suggestion_result"].movies
+        detailed_results: list[MovieInfoData] = graph_result["detailed_results"]
 
         print(f"\n--- Top 10 Filmes de {genre.title()} Recomendados ---")
         for movie_title in suggested_movies:
@@ -53,7 +53,7 @@ def main(genre: str):
             # 2. Convertendo os resultados para um DataFrame do Pandas
             # Usamos model_dump() para transformar cada objeto Pydantic em um dicionário
             df = pd.DataFrame([movie.model_dump() for movie in detailed_results])
-            
+
             print("--- Análise de Dados (DataFrame) ---")
             print(df)
             print("------------------------------------\n")
@@ -64,8 +64,7 @@ def main(genre: str):
             csv_filepath = settings.output_dir / f"analise_{sanitized_genre}_detalhada.csv"
 
             with open(txt_filepath, "w", encoding="utf-8") as f:
-                for title in suggested_movies:
-                    f.write(f"{title}\n")
+                f.writelines(f"{title}\n" for title in suggested_movies)
             logger.info(f"📝 Lista de sugestões salva em: {txt_filepath}")
 
             # 4. Usando o método .to_csv() do DataFrame, que é mais simples e robusto

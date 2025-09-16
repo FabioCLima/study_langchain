@@ -261,19 +261,19 @@ def test_question_enhancement():
     enhanced = enhance_question(input_q, "Python")
     assert "Python dictionaries" in enhanced
     assert "examples" in enhanced
-    
+
 def test_specialist_assignment():
     """Test that specialist role is properly set"""
     specialist = create_specialist("Python")
     assert specialist.domain == "Python"
     assert "Python expert" in specialist.system_prompt
-    
+
 def test_knowledge_boundary():
     """Test 'I don't know' responses for out-of-scope questions"""
     python_specialist = create_specialist("Python")
     response = python_specialist.answer("How to invest in stocks?")
     assert "I don't know" in response
-    
+
 def test_workflow_integration():
     """Test complete question-to-answer flow"""
     # Test: User sets specialization → asks question → gets expert answer

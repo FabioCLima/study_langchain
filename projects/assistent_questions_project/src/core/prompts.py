@@ -1,12 +1,11 @@
-"""
-Prompts Module for the Assistant Questions Project
+"""Prompts Module for the Assistant Questions Project
 ===================================================
 
 This module centralizes all prompt templates used by the agents.
 Using LangChain's PromptTemplate for consistency and flexibility.
 """
 
-from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 
 # =============================================================================
 # 1. Question Enhancement Agent Prompt
@@ -42,10 +41,15 @@ Structure your answers in a readable format using markdown.
 """
 
 # Vamos combinar o prompt de sistema e o de usuário em um único template de chat
-specialist_chat_prompt = ChatPromptTemplate([
-    ("system", SPECIALIST_SYSTEM_PROMPT),
-    ("human", "Based on your expertise, please provide a comprehensive answer to the following question:\n\nQuestion: {question}")
-])
+specialist_chat_prompt = ChatPromptTemplate(
+    [
+        ("system", SPECIALIST_SYSTEM_PROMPT),
+        (
+            "human",
+            "Based on your expertise, please provide a comprehensive answer to the following question:\n\nQuestion: {question}",
+        ),
+    ]
+)
 
 # =============================================================================
 # 3. Knowledge Boundary Agent Prompt

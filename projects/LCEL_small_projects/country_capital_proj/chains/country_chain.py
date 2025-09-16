@@ -7,11 +7,12 @@ Exporta:
 from collections.abc import Mapping
 from typing import Any
 
-from country_capital_proj.config import settings
-from country_capital_proj.models import Curiosidade, Pais, ResultadoFinal
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
+
+from country_capital_proj.config import settings
+from country_capital_proj.models import Curiosidade, Pais, ResultadoFinal
 
 
 def _build_country_chain() -> Runnable:

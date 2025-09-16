@@ -2,7 +2,7 @@
 
 import sys
 
-from loguru import logger  #! <-- A LINHA QUE FALTAVA
+from loguru import logger  # ! <-- A LINHA QUE FALTAVA
 
 from core.settings import settings
 

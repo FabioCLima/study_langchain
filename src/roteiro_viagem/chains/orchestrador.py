@@ -1,23 +1,22 @@
-"""
-Orquestrador de chains (versão procedural, com logging, validação e fallback).
+"""Orquestrador de chains (versão procedural, com logging, validação e fallback).
 
 Este orquestrador executa as chains em sequência (destino -> restaurantes & passeios),
 normaliza os modelos Pydantic para `dict`, valida valores essenciais (ex.: cidade)
 e aplica fallbacks em caso de erro nas subchains.
 """
 
-from typing import Any, Callable, Dict
+from collections.abc import Callable
+from typing import Any
 
 from chains.chain_destino import create_chain_destino
-from chains.chain_restaurante import create_chain_restaurantes
 from chains.chain_passeios import create_chain_passeios_culturais
-from models.pydantic_models import ListaRestaurantes, ListaAtracoes
+from chains.chain_restaurante import create_chain_restaurantes
+from models.pydantic_models import ListaAtracoes, ListaRestaurantes
 from utils.logger_setup import project_logger  # Loguru
 
 
-def create_main_chain(model) -> Callable[[Dict[str, Any]], Dict[str, Any]]:
-    """
-    Cria a função principal que orquestra a geração do roteiro.
+def create_main_chain(model) -> Callable[[dict[str, Any]], dict[str, Any]]:
+    """Cria a função principal que orquestra a geração do roteiro.
 
     Retorna um callable que recebe um dicionário de inputs (ex.: {"interesse": "trekking"})
     e devolve um dicionário com a estrutura:
@@ -34,7 +33,7 @@ def create_main_chain(model) -> Callable[[Dict[str, Any]], Dict[str, Any]]:
     chain_restaurantes = create_chain_restaurantes(model)
     chain_passeios_culturais = create_chain_passeios_culturais(model)
 
-    def run_main(inputs: Dict[str, Any]) -> Dict[str, Any]:
+    def run_main(inputs: dict[str, Any]) -> dict[str, Any]:
         project_logger.info("[Orquestrador] Iniciando execução do roteiro")
         project_logger.debug(f"[Orquestrador] Inputs iniciais: {inputs!r}")
 

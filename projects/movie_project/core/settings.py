@@ -47,8 +47,7 @@ settings.output_dir.mkdir(parents=True, exist_ok=True)
 
 
 def setup_environment() -> None:
-    """
-    Configura as variáveis de ambiente necessárias para OpenAI e LangSmith
+    """Configura as variáveis de ambiente necessárias para OpenAI e LangSmith
     a partir do objeto de settings já carregado.
     """
     # --- Configuração da OpenAI ---

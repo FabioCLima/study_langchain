@@ -1,20 +1,19 @@
 # pyright: reportGeneralTypeIssues=false, reportUnknownMemberType=false
-"""
-Módulo responsável por construir e expor as chains LangChain do projeto.
+"""Módulo responsável por construir e expor as chains LangChain do projeto.
 """
 
-from typing import Any, Dict
-from langchain_core.runnables import Runnable
+from typing import Any
+
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
 
-from core.models import MovieList, MovieInfoData
+from core.models import MovieInfoData, MovieList
 from core.settings import settings
 
 
-def create_movie_suggestion_chain() -> Runnable[Dict[str, Any], MovieList]:
-    """
-    Cria e retorna uma chain que sugere filmes de um gênero específico,
+def create_movie_suggestion_chain() -> Runnable[dict[str, Any], MovieList]:
+    """Cria e retorna uma chain que sugere filmes de um gênero específico,
     estruturando a saída no modelo MovieList.
     """
     llm = ChatOpenAI(
@@ -37,17 +36,17 @@ def create_movie_suggestion_chain() -> Runnable[Dict[str, Any], MovieList]:
 
     # Com o Pyright instruído a ignorar os erros, não precisamos mais do 'cast'
     # ou de anotações complexas aqui dentro. O código fica mais limpo.
-    structured_llm = llm.with_structured_output(MovieList) #type: ignore
+    structured_llm = llm.with_structured_output(MovieList)  # type: ignore
 
-    chain = prompt_template | structured_llm #type: ignore
+    chain = prompt_template | structured_llm  # type: ignore
 
-    return chain #type: ignore
+    return chain  # type: ignore
 
 # Adicione esta função ao seu core/chains.py
 
-def create_movie_details_chain() -> Runnable[Dict[str, Any], MovieInfoData]:
-    """
-    Cria uma chain que recebe o título de um filme e retorna
+
+def create_movie_details_chain() -> Runnable[dict[str, Any], MovieInfoData]:
+    """Cria uma chain que recebe o título de um filme e retorna
     informações detalhadas sobre ele, usando o modelo MovieInfoData.
     """
     llm = ChatOpenAI(
@@ -68,6 +67,6 @@ def create_movie_details_chain() -> Runnable[Dict[str, Any], MovieInfoData]:
         ]
     )
 
-    structured_llm = llm.with_structured_output(MovieInfoData) #type: ignore
-    details_chain = prompt_template | structured_llm #type: ignore
-    return details_chain #type: ignore
+    structured_llm = llm.with_structured_output(MovieInfoData)  # type: ignore
+    details_chain = prompt_template | structured_llm  # type: ignore
+    return details_chain  # type: ignore

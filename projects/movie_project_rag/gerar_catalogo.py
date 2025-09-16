@@ -1,16 +1,17 @@
 # gerar_catalogo.py
 
 import json
+
 from core.logger import logger
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
 from core.models import CatalogoFilmes
 from dotenv import load_dotenv
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
 
 def main():
-    """
-    Função principal para gerar o catálogo de filmes e salvá-lo em JSON.
+    """Função principal para gerar o catálogo de filmes e salvá-lo em JSON.
     """
     # 1. Carrega as variáveis de ambiente
     load_dotenv()
@@ -32,7 +33,7 @@ def main():
     prompt_template = ChatPromptTemplate.from_messages(
         [
             ("system", "Você é um assistente especialista em cinema, fluente em português do Brasil."),
-            ("human", 
+            ("human",
              "Crie um catálogo com 30 filmes excelentes do gênero de {genero}. "
              "Para cada filme, forneça um título e uma sinopse concisa e informativa. "
              "Siga estritamente o formato de saída solicitado.\n"
@@ -58,11 +59,11 @@ def main():
     # 8. Salva o resultado em um arquivo JSON
     output_path = "data/movie_catalog.json"
     logger.info(f"Salvando o catálogo em {output_path}...")
-    
+
     try:
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(resultado.model_dump(), f, ensure_ascii=False, indent=2)
-        
+
         logger.info(f"Catálogo salvo com sucesso em {output_path}!")
     except Exception as e:
         logger.error(f"Ocorreu um erro ao salvar o arquivo JSON: {e}")
@@ -70,9 +71,9 @@ def main():
 
     # Exibindo uma amostra do resultado
     logger.info("--- Amostra do Catálogo Gerado ---")
-    
+
     amostra = resultado.filmes[:2]
-    
+
     for i, filme in enumerate(amostra, 1):
         logger.info(f"Filme {i}:")
         logger.info(f"  Título: {filme.title}")

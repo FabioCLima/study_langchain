@@ -1,6 +1,5 @@
 # assistent_questions_project/src/core/state.py
-"""
-State Management Module for Assistant Questions Project
+"""State Management Module for Assistant Questions Project
 ======================================================
 
 Defines the shared state for the LangGraph workflow.
@@ -13,9 +12,9 @@ from typing import TypedDict
 # Agent State Definition
 # =============================================================================
 
+
 class AgentState(TypedDict):
-    """
-    Represents the shared memory of the workflow.
+    """Represents the shared memory of the workflow.
 
     Each node in the graph reads from and writes to this state,
     allowing information to flow through the system.
@@ -25,11 +24,14 @@ class AgentState(TypedDict):
         enhanced_question: The question after being improved by the enhancer agent.
         answer: The final response from the specialist agent.
         specialization: The domain of expertise for the current session.
+
     """
+
     original_question: str
     enhanced_question: str
     answer: str
     specialization: str
+
 
 # =============================================================================
 # Example Usage (for understanding)

@@ -22,6 +22,7 @@ Example:
 
 Attributes:
     settings (Settings): Instância global das configurações da aplicação.
+
 """
 
 
@@ -29,9 +30,8 @@ from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
 
-
 class Settings(BaseSettings):
-    #* Chaves de API
+    # * Chaves de API
     """Classe de configurações da aplicação de roteiro de viagem.
     
     Esta classe define todas as configurações necessárias para a aplicação,
@@ -53,8 +53,9 @@ class Settings(BaseSettings):
     Note:
         As chaves de API são armazenadas como SecretStr para maior segurança.
         Use .get_secret_value() para acessar o valor real da chave.
+
     """
-    
+
     openai_api_key: SecretStr
     langchain_api_key: SecretStr
 
@@ -73,9 +74,9 @@ class Settings(BaseSettings):
         "env_file_encoding": "utf-8",
         "extra": "ignore"  # Ignora variáveis extras do .env
     }
-    
-    #* Validações opcionais
-    @field_validator('temperature')
+
+    # * Validações opcionais
+    @field_validator("temperature")
     @classmethod
     def validate_temperature(cls, v: float) -> float:
         """Valida se a temperatura está dentro do intervalo permitido.
@@ -93,12 +94,13 @@ class Settings(BaseSettings):
             A temperatura controla a aleatoriedade das respostas do modelo.
             Valores menores (próximos a 0) geram respostas mais determinísticas,
             enquanto valores maiores (próximos a 2) geram respostas mais criativas.
+
         """
         if not 0 <= v <= 2:
-            raise ValueError('Temperature deve estar entre 0 e 2')
+            raise ValueError("Temperature deve estar entre 0 e 2")
         return v
-    
-    @field_validator('max_tokens')
+
+    @field_validator("max_tokens")
     @classmethod
     def validate_max_tokens(cls, v: int) -> int:
         """Valida se max_tokens é um valor positivo.
@@ -116,20 +118,20 @@ class Settings(BaseSettings):
             max_tokens define o limite máximo de tokens que o modelo pode gerar
             em uma única resposta. Um token é aproximadamente uma palavra ou
             parte de uma palavra.
+
         """
-        
         if v <= 0:
-            raise ValueError('max_tokens deve ser positivo')
+            raise ValueError("max_tokens deve ser positivo")
         return v
 
-# Instância global das configurações
-settings = Settings() # type: ignore
 
+# Instância global das configurações
+settings = Settings()  # type: ignore
 
 
 if __name__ == "__main__":
     try:
-        test_settings = Settings() # type: ignore
+        test_settings = Settings()  # type: ignore
         print("✅ Configurações carregadas com sucesso!")
         print(f"Modelo: {test_settings.model_name}")
         print(f"Temperature: {test_settings.temperature}")

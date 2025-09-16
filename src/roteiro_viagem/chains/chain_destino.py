@@ -1,5 +1,4 @@
-"""
-Chain - Destino
+"""Chain - Destino
 A partir do interesse do usuário, a chain retorna uma cidade recomendada.
 """
 from collections.abc import Callable
@@ -16,8 +15,7 @@ if TYPE_CHECKING:
 
 
 def create_chain_destino(model: ChatOpenAI) -> Callable[[dict[str, Any]], Destino]:
-    """
-    Cria uma chain que, a partir do interesse de atividade do usuário,
+    """Cria uma chain que, a partir do interesse de atividade do usuário,
     recomenda uma cidade ou região no Brasil ou no mundo onde essa atividade
     seja especialmente atrativa, justificando a escolha.
     """
