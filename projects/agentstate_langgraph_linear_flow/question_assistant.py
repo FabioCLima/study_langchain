@@ -86,7 +86,17 @@ def setup_llm(
 # ! 5. DEFINIÇÃO DO ESTADO
 # ! =============================================================================
 class AgentState(TypedDict):
-    """Estado compartilhado para o Assistente de Perguntas."""
+    """Define a estrutura do estado compartilhado que flui através do grafo.
+
+    Este TypedDict garante que os dados passados entre os nós do LangGraph
+    tenham um formato consistente.
+
+    Attributes:
+        original_question (str): A pergunta inicial fornecida pelo usuário.
+        question_clarified (str): A pergunta reformulada pelo LLM para maior clareza.
+        answer (str): A resposta final gerada pelo LLM para a pergunta clarificada.
+
+    """
 
     original_question: str
     question_clarified: str
